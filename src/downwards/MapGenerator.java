@@ -12,6 +12,9 @@ public class MapGenerator {
         this.width=width;
         this.height=height;
         terrain = new Tile[width][height];
+        fillArea(0,0,width,height,TileType.FLOOR);
+        fillArea(14,51,10,10,TileType.WALL);
+        fillArea(5,20,20,10,TileType.GRASS);
     }
     
     
@@ -21,5 +24,9 @@ public class MapGenerator {
                 terrain[xp][yp] = new Tile(xp,yp,type);
             }
         }
+    }
+    
+    public Tile[][] getTerrain(){
+        return terrain;
     }
 }   

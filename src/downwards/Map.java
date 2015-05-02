@@ -3,20 +3,25 @@ package downwards;
  // @author laptopng34
 public class Map implements MapInterface {
 
-    public static final int WIDTH = 100;
-    public static final int HEIGHT = 100;
+    public final int WIDTH = 100;
+    public final int HEIGHT = 100;
     private Tile[][] terrain = new Tile[WIDTH][HEIGHT];
     private Entity[][] entities = new Entity[WIDTH][HEIGHT];
     private boolean[][] visited = new boolean[WIDTH][HEIGHT];
 
     public Map() {
+
         MapGenerator mg = new MapGenerator(WIDTH, HEIGHT);
+        terrain = mg.getTerrain();
+
     }
 
+    @Override
     public int getWidth() {
         return WIDTH;
     }
 
+    @Override
     public int getHeight() {
         return HEIGHT;
     }
@@ -25,24 +30,29 @@ public class Map implements MapInterface {
         return visited[x][y];
     }
 
+    @Override
     public void pathFinderVisited(int x, int y) {
         visited[x][y] = true;
     }
 
+    @Override
     public boolean blocked(Mover mover, int x, int y) {
         if (getEntity(x, y) != null) {
             return true;
         }
         EntityType e = ((EntityMover) mover).getType();
 
-        if (e == EntityType.PLAYER || e == EntityType.CAVETHING) {
-            return terrain[x][y].getType() != TileType.FLOOR;
+        if (e == EntityType.PLAYER) {
+            return (terrain[x][y].getType() != TileType.FLOOR
+                    && terrain[x][y].getType() != TileType.GRASS);
         }
-
+        if (e == EntityType.CAVETHING) {
+            return terrain[x][y].getType() != TileType.FLOOR;        
+        }
         return true;
-
     }
 
+    @Override
     public float getCost(Mover mover, int sx, int sy, int tx, int ty) {
         return 1;
     }
@@ -61,6 +71,10 @@ public class Map implements MapInterface {
                 visited[x][y] = false;
             }
         }
+    }
+
+    public Tile getTile(int x, int y) {
+        return terrain[x][y];
     }
 
 }
