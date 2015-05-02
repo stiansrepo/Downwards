@@ -44,6 +44,10 @@ public class MapPanel extends JPanel implements ComponentListener {
             public void keyPressed(KeyEvent e) {
                 player.keyPressed(e);
                 player.move();
+                for(Monster m : monsters){
+                   m.target();
+                   m.move();
+                }
                 moveCamera();
                 repaint();
             }

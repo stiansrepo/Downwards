@@ -4,12 +4,17 @@ package downwards;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
-public class Player extends Entity{
-    
-    public Player(int x, int y, int width, int height, Color color, Map map, EntityType e){
-        super(x,y,width,height,color,map,e);
+public class Player extends Entity {
+
+    public Player(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e) {
+        super(x, y, width, height, color, map, game, e);
+        name = "Player";
+        maxhealth = 100;
+        health = maxhealth;
+        strength = 10;
+        defense = 10;
     }
-    
+
     public void keyReleased(KeyEvent e) {
 
         switch (e.getKeyCode()) {
@@ -46,5 +51,5 @@ public class Player extends Entity{
                 break;
         }
     }
-   
+
 }
