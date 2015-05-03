@@ -11,7 +11,7 @@ public class Map implements MapInterface {
 
     public Map() {
 
-        MapGenerator mg = new MapGenerator(WIDTH, HEIGHT);
+        MapGenerator mg = new MapGenerator(WIDTH,HEIGHT);
         terrain = mg.getTerrain();
 
     }
@@ -28,6 +28,10 @@ public class Map implements MapInterface {
 
     public boolean visited(int x, int y) {
         return visited[x][y];
+    }
+    
+    public boolean[][] getAllVisited(){
+        return visited;
     }
 
     @Override

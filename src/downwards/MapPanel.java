@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.KeyEvent;
@@ -24,7 +26,7 @@ public class MapPanel extends JPanel implements ComponentListener {
     private int camY;
     private Map map;
     private Game game;
-    private final int scale = 15;
+    private final int scale = 25;
     private Player player;
     private Monster[] monsters;
 
@@ -37,19 +39,16 @@ public class MapPanel extends JPanel implements ComponentListener {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                player.keyReleased(e);
+                game.keyReleased(e);
+
             }
 
             @Override
             public void keyPressed(KeyEvent e) {
-                player.keyPressed(e);
-                player.move();
-                for(Monster m : monsters){
-                   m.target();
-                   m.move();
-                }
+                game.keyPressed(e);
                 moveCamera();
                 repaint();
+
             }
         });
         this.addComponentListener(this);
@@ -124,35 +123,46 @@ public class MapPanel extends JPanel implements ComponentListener {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_OFF);
         ;
-
         g2d.scale(scale, scale);
         g2d.translate(-camX, -camY);
         g2d.drawImage(drawnMap, null, this);
         player.paint(g2d);
-        for (Monster m : monsters){
+        for (Monster m : monsters) {
             m.paint(g2d);
         }
+
         g2d.translate(camX, camY);
+        
+        if (game.getGameOver()) {
+            g2d.scale(1, 1);
+            g2d.setColor(Color.MAGENTA);
+            g2d.setFont(new Font("Courier", Font.PLAIN, 5));
+            g2d.drawString("GAME OVER", 1, 15);
+        }
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e
+    ) {
 
     }
 
     @Override
-    public void componentMoved(ComponentEvent e) {
+    public void componentHidden(ComponentEvent e
+    ) {
 
     }
 
     @Override
-    public void componentHidden(ComponentEvent e) {
-
-    }
-
-    @Override
-    public void componentResized(ComponentEvent e) {
+    public void componentResized(ComponentEvent e
+    ) {
         initCam();
     }
 
     @Override
-    public void componentShown(ComponentEvent e) {
+    public void componentShown(ComponentEvent e
+    ) {
         moveCamera();
     }
+
 }

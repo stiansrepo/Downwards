@@ -15,13 +15,13 @@ import javax.swing.JPanel;
 public class Frame extends JFrame {
 
     private Game game;
-    private Panel panel;    
+    private Panel panel;
     public MapPanel mappanel;
     private InfoPanel infopanel;
 
-    public Frame(Game game) throws InterruptedException {
-        this.game = game;
+    public Frame() throws InterruptedException {
         initUI();
+        
     }
 
     private void initUI() throws InterruptedException {
@@ -46,9 +46,11 @@ public class Frame extends JFrame {
         setTitle("Downwards! Pre-Alpha version");
         //setSize(1000, 1000);
 
-        panel = new Panel();
-        mappanel = new MapPanel(game);
         infopanel = new InfoPanel();
+        panel = new Panel();
+       
+        game = new Game(infopanel);
+        mappanel = new MapPanel(game);
         JPanel blank = new JPanel();
 
         JLabel jl = new JLabel("blank part");

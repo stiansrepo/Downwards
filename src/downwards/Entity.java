@@ -3,9 +3,11 @@ package downwards;
  // @author laptopng34
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 
 public class Entity {
 
+    private Game game;
     private Map map;
     public int x;
     public int y;
@@ -19,42 +21,86 @@ public class Entity {
     public int health;
     public int strength;
     public int defense;
-    public Item[] inventory;
+    public ArrayList<Item> inventory;
     public String name;
+    public boolean alive = true;
 
     public Entity(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e) {
-        
+
         this.x = x;
         this.y = y;
-        this.width=width;
-        this.height=height;
+        this.width = width;
+        this.height = height;
         this.map = map;
         this.color = color;
-        this.e=e;
-        map.setEntity(this, x, y);
+        this.e = e;
+        this.game = game;
+
+        //map.setEntity(this, x, y);
+        inventory = new ArrayList();
+    }
+
+    public void kill() {
+        alive = false;
+    }
+
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public EntityType getType() {
+        return e;
     }
 
     public void move() {
-        map.setEntity(null, x, y);
+
         EntityMover em = new EntityMover(e);
-        if (!(map.blocked(em, x+xs, y+ys))){
-        x = x + xs;
-        y = y + ys;
+        if (!game.getGameOver()) {
+            if (!(map.blocked(em, x + xs, y + ys))) {
+                map.setEntity(null, x, y);
+                x = x + xs;
+                y = y + ys;
+                map.setEntity(this, x, y);
+            } else if (map.getEntity(x + xs, y + ys) != null) {
+                if (map.getEntity(x + xs, y + ys).getType() != this.e) {
+                    combat(map.getEntity(x + xs, y + ys));
+                    xs = 0;
+                    ys = 0;
+                }
+            }
         }
-        
-        map.setEntity(this, x, y);
+    }
+
+    public void takeDamage(int d) {
+        health = health - d;
+        if (health <= 0) {
+            kill();
+        }
+    }
+
+    public void combat(Entity target) {
+        game.combat(this, target);
+
+    }
+
+    public int getStrength() {
+        return strength;
     }
 
     public void paint(Graphics2D g2d) {
-        g2d.setColor(color);
+        if (alive) {
+            g2d.setColor(color);
+        } else {
+            g2d.setColor(Color.WHITE);
+        }
         g2d.fillRect(x, y, width, height);
     }
-    
-    public int getX(){
+
+    public int getX() {
         return x;
     }
-    
-    public int getY(){
+
+    public int getY() {
         return y;
     }
 

@@ -16,4 +16,8 @@ public class Tile {
     public TileType getType(){
         return t;
     }
+    
+    public void setType(TileType t){
+        this.t=t;
+    }
 }
