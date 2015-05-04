@@ -10,8 +10,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
@@ -24,35 +30,17 @@ public class MapPanel extends JPanel implements ComponentListener {
     private int offsetMinY = 0;
     private int camX;
     private int camY;
-    private Map map;
+    private WorldMap map;
     private Game game;
     private final int scale = 25;
     private Player player;
     private Monster[] monsters;
 
     public MapPanel(Game game) {
-
-        addKeyListener(new KeyListener() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {
-                game.keyReleased(e);
-
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                game.keyPressed(e);
-                moveCamera();
-                repaint();
-
-            }
-        });
+        addListeners();
         this.addComponentListener(this);
         setFocusable(true);
+
         this.game = game;
         player = game.getPlayer();
         map = game.getMap();
@@ -61,9 +49,44 @@ public class MapPanel extends JPanel implements ComponentListener {
         offsetMaxX = map.getWidth() - getWidth();
         offsetMaxY = map.getHeight() - getHeight();
         drawMap();
-
     }
 
+    private void addListeners() {
+        addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+            @Override
+            public void keyReleased(KeyEvent e) {
+                game.keyReleased(e);
+            }
+            @Override
+            public void keyPressed(KeyEvent e) {
+                game.keyPressed(e);
+                moveCamera();
+                repaint();
+            }
+        });
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                grabFocus();
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
+    }
+    
     public void initCam() {
         offsetMaxX = map.getWidth() - (getWidth() / scale);
         offsetMaxY = map.getHeight() - (getHeight() / scale);
@@ -132,7 +155,7 @@ public class MapPanel extends JPanel implements ComponentListener {
         }
 
         g2d.translate(camX, camY);
-        
+
         if (game.getGameOver()) {
             g2d.scale(1, 1);
             g2d.setColor(Color.MAGENTA);

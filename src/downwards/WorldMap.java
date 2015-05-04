@@ -1,7 +1,7 @@
 package downwards;
 
  // @author laptopng34
-public class Map implements MapInterface {
+public class WorldMap implements MapInterface {
 
     public final int WIDTH = 100;
     public final int HEIGHT = 100;
@@ -9,7 +9,7 @@ public class Map implements MapInterface {
     private Entity[][] entities = new Entity[WIDTH][HEIGHT];
     private boolean[][] visited = new boolean[WIDTH][HEIGHT];
 
-    public Map() {
+    public WorldMap() {
 
         MapGenerator mg = new MapGenerator(WIDTH,HEIGHT);
         terrain = mg.getTerrain();

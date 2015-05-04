@@ -4,14 +4,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -22,12 +21,14 @@ public class InfoPanel extends JPanel {
     private String res = "";
     private JLabel turn;
     private JLabel health;
-    private JLabel inventory;
+    private JList inventory;
+    private DefaultListModel invListModel;
     private JTextArea combat;
     private JScrollPane jsp;
-    private DefaultCaret caret;
+    private JScrollPane jspinv;
 
     public InfoPanel() {
+
         GridBagConstraints turnc = new GridBagConstraints();
         GridBagConstraints healthc = new GridBagConstraints();
         GridBagConstraints combatc = new GridBagConstraints();
@@ -65,26 +66,32 @@ public class InfoPanel extends JPanel {
         turn = new JLabel("Turn: 0");
         health = new JLabel("Health: 100/100");
         combat = new JTextArea("");
-        inventory = new JLabel("Inventory");
-        
-        
-        combat.setEditable(false);
+        invListModel = new DefaultListModel();
+        inventory = new JList(invListModel);
 
+        inventory.setSize(new Dimension(100, 80));
+
+        combat.setEditable(false);
         combat.setSize(new Dimension(500, 80));
 
-        caret = (DefaultCaret) combat.getCaret();
+        DefaultCaret caret = (DefaultCaret) combat.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
         jsp = new JScrollPane(combat);
+        jspinv = new JScrollPane(inventory);
 
-        jsp.setPreferredSize(new Dimension(500, 80));
+        jsp.setPreferredSize(new Dimension(500, 90));
+        jspinv.setPreferredSize(new Dimension(200, 90));
+
         Font font = new Font("Verdana", Font.PLAIN, 14);
         turn.setFont(font);
         health.setFont(font);
+
         add(turn, turnc);
         add(health, healthc);
         add(jsp, combatc);
-        add(inventory, inventoryc);
+        add(jspinv, inventoryc);
+
     }
 
     public void updateInfo(String[] info) {
@@ -101,8 +108,12 @@ public class InfoPanel extends JPanel {
          e.printStackTrace();
          }*/
     }
-    
-    public void updateInventory(String s){
-        inventory.setText(s);
+
+    public void updateInventory(List<Item> s) {
+        invListModel.clear();
+        for(Item i : s){
+            String ss = i.getName();
+            invListModel.addElement(ss);
+        }
     }
 }

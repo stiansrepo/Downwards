@@ -5,6 +5,10 @@ import java.util.Random;
 
 public class Dice {
 
+    private Dice(){
+        
+    }
+    
     public static int rollDice(int rolls, int range) {
         Random rnd = new Random();
         int roll = 0;

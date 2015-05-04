@@ -3,19 +3,21 @@ package downwards;
  // @author laptopng34
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.Iterator;
 
 public class Player extends Entity {
 
     private Game game;
 
-    public Player(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e, String name) {
-        super(x, y, width, height, color, map, game, e, name);
+    public Player(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) {
+        super(x, y, width, height, color, map, game, e, name, stats);
         maxhealth = 100;
         health = maxhealth;
-        strength = 10;
         defense = 10;
+        this.stats = stats;
         weapon = new Weapon("Great Axe", "Smash!", 12, 1, 8);
         this.game = game;
+        
     }
 
     public void keyReleased(KeyEvent e) {
@@ -39,16 +41,6 @@ public class Player extends Entity {
         }
     }
 
-    public void loot() {
-        if (game.map.getEntity(x + xs, y + ys) != null) {
-            for (Item i : game.map.getEntity(x + xs, y + ys).inventory) {
-                inventory.add(i);
-                game.map.getEntity(x + xs, y + ys).inventory.remove(i);
-            }
-        }
-        game.updateInventory();
-    }
-
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
 
@@ -65,9 +57,20 @@ public class Player extends Entity {
                 ys = 1;
                 break;
             case KeyEvent.VK_L:
-                 loot();
-                 break;
+                loot();
+                break;
         }
     }
 
+    public void loot() {
+        if (standingOn!=null) {
+            Iterator iterator = standingOn.inventory.iterator();
+            while (iterator.hasNext()) {
+                this.inventory.add((Item)iterator.next());                               
+            }
+            standingOn.inventory.clear();
+            game.updateInventory();
+        }
+        
+    }
 }

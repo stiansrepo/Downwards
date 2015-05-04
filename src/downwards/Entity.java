@@ -4,11 +4,13 @@ package downwards;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Entity {
 
     private Game game;
-    private Map map;
+    private WorldMap map;
     public int x;
     public int y;
     public int xs;
@@ -17,16 +19,17 @@ public class Entity {
     public int height;
     public Color color;
     public EntityType e;
-    public int maxhealth;
-    public int health;
-    public int strength;
-    public int defense;
-    public ArrayList<Item> inventory;
+    public List<Item> inventory;
     public Weapon weapon;
     public String name;
     public boolean alive = true;
+    public int maxhealth;
+    public int health;
+    public Stats stats;
+    public int defense;
+    public Entity standingOn;
 
-    public Entity(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e, String name) {
+    public Entity(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -36,10 +39,11 @@ public class Entity {
         this.e = e;
         this.game = game;
         this.name = name;
-        inventory = new ArrayList();
+        this.stats = stats;
+        inventory = new CopyOnWriteArrayList();
     }
-    
-    public Entity(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e, String name, Weapon w) {
+
+    public Entity(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats, Weapon weapon) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -49,8 +53,25 @@ public class Entity {
         this.e = e;
         this.game = game;
         this.name = name;
-        this.weapon=weapon;
-        inventory = new ArrayList();
+        this.weapon = weapon;
+        this.stats = stats;
+        inventory = new CopyOnWriteArrayList();
+    }
+
+    public Entity(Entity entity) {
+        this.x = entity.x;
+        this.y = entity.y;
+        this.width = entity.width;
+        this.height = entity.height;
+        this.map = entity.map;
+        this.color = entity.color;
+        this.e = entity.e;
+        this.game = entity.game;
+        this.name = entity.name;
+        this.weapon = entity.weapon;
+        this.stats = entity.stats;
+        this.alive = entity.alive;
+        this.inventory = entity.inventory;
     }
 
     public void setWeapon(Weapon w) {
@@ -82,7 +103,12 @@ public class Entity {
         EntityMover em = new EntityMover(e);
         if (!game.getGameOver()) {
             if (!(map.blocked(em, x + xs, y + ys))) {
-                map.setEntity(null, x, y);
+                if (standingOn != null) {
+                    map.setEntity(standingOn, x, y);
+                    standingOn = null;
+                } else {
+                    map.setEntity(null, x, y);
+                }
                 x = x + xs;
                 y = y + ys;
                 map.setEntity(this, x, y);
@@ -90,9 +116,19 @@ public class Entity {
                 if (map.getEntity(x + xs, y + ys).getType() != this.e) {
                     if (map.getEntity(x + xs, y + ys).isAlive()) {
                         combat(map.getEntity(x + xs, y + ys));
+                        xs = 0;
+                        ys = 0;
+                    } else if (!map.getEntity(x + xs, y + ys).isAlive()) {
+                        if (standingOn != null) {
+                            map.setEntity(standingOn, x, y);
+                        } else {
+                            map.setEntity(null, x, y);
+                        }
+                        standingOn = new Entity(map.getEntity(x + xs, y + ys));
+                        x = x + xs;
+                        y = y + ys;
+                        map.setEntity(this, x, y);
                     }
-                    xs = 0;
-                    ys = 0;
                 }
             }
         }
@@ -109,8 +145,12 @@ public class Entity {
         game.combatparser.combat(this, target);
     }
 
-    public int getStrength() {
-        return strength;
+    public Stats getStats() {
+        return stats;
+    }
+
+    public int getDefense() {
+        return defense;
     }
 
     public void paint(Graphics2D g2d) {

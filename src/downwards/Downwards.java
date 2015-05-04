@@ -7,6 +7,5 @@ public class Downwards {
 
         Frame frame = new Frame();
         frame.setVisible(true);
-
     }
 }

@@ -6,53 +6,48 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class Frame extends JFrame {
+public class Frame extends JFrame{
 
     private Game game;
     private Panel panel;
     public MapPanel mappanel;
     private InfoPanel infopanel;
 
-    public Frame() throws InterruptedException {
+    public Frame(){
         initUI();
-        
     }
 
-    private void initUI() throws InterruptedException {
+    private void initUI() {
 
         Font myFont = new Font("Verdana", Font.PLAIN, 12);
-
-        try {
-
-            File fontFile = new File(getClass().getClassLoader().getResource("Fixedsys500c.ttf").getFile());
-
-            myFont = Font.createFont(Font.TRUETYPE_FONT, fontFile).deriveFont(Font.PLAIN, 15f);
-
-            GraphicsEnvironment ge
-                    = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            ge.registerFont(myFont);
-        } catch (IOException | FontFormatException e) {
-            System.out.println(e.getMessage());
-        }
 
         BorderLayout gl = new BorderLayout();
 
         setTitle("Downwards! Pre-Alpha version");
-        //setSize(1000, 1000);
 
-        infopanel = new InfoPanel();
+        setExtendedState(MAXIMIZED_BOTH);
+
         panel = new Panel();
-       
+        infopanel = new InfoPanel();
         game = new Game(infopanel);
         mappanel = new MapPanel(game);
+        mappanel.setVisible(true);
+        mappanel.setFocusable(true);
+
         JPanel blank = new JPanel();
-       
+
         JLabel jl = new JLabel("blank part");
         jl.setFont(myFont);
 
@@ -73,8 +68,8 @@ public class Frame extends JFrame {
 
         add(panel);
         pack();
-
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }
+    
 }

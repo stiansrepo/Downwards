@@ -5,27 +5,24 @@ import java.awt.Color;
 public class Monster extends Entity {
 
     private Player player;
-    private Map map;
+    private WorldMap map;
 
-    public Monster(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e, String name) {
-        super(x, y, width, height, color, map, game, e, name);
+    public Monster(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) {
+        super(x, y, width, height, color, map, game, e, name, stats);
         maxhealth = 20;
-        health = maxhealth;
-        strength = 1;
-        defense = 1;
+        health = maxhealth;     
         player = game.player;
         ys = 0;
         xs = 0;
+        this.stats=stats;
         this.map = map;
         weapon = new Weapon("Bare hands", "aw", 1, 1, 2);
     }
 
-    public Monster(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e, String name, Weapon weapon) {
-        super(x, y, width, height, color, map, game, e, name, weapon);
+    public Monster(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats, Weapon weapon) {
+        super(x, y, width, height, color, map, game, e, name, stats, weapon);
         maxhealth = 20;
         health = maxhealth;
-        strength = 1;
-        defense = 1;
         player = game.player;
         ys = 0;
         xs = 0;

@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class Game {
 
-    public Map map;
+    public WorldMap map;
     public Player player;
     public Monster[] monsters;
     public Random rnd;
@@ -15,14 +15,16 @@ public class Game {
     private InfoPanel infopanel;
     private boolean gameOver = false;
     private String[] infostring;
+    private ItemGenerator itemGenerator;
     public CombatParser combatparser;
 
     public Game(InfoPanel infopanel) {
         this.infopanel = infopanel;
+        itemGenerator = new ItemGenerator();
         combatparser = new CombatParser(this);
         infostring = new String[3];
         rnd = new Random();
-        map = new Map();
+        map = new WorldMap();
         setPlayerStart();
         setMonsterStart(10);
     }
@@ -37,26 +39,24 @@ public class Game {
     }
 
     private void setMonsterStart(int amt) {
-        Weapon wp = new Weapon("Glowing pickaxe","A glowing axe, taken from the corpse of a delirious miner",5,2,4);
         monsters = new Monster[amt];
         int found = 0;
         EntityMover em = new EntityMover(EntityType.PLAYER);
+        Stats stats = new Stats();
         while (found < amt) {
             int x = 1 + rnd.nextInt(map.getWidth() - 1);
             int y = 1 + rnd.nextInt(map.getHeight() - 1);
             if (!map.blocked(em, x, y)) {
-                monsters[found] = new Monster(x, y, 1, 1, Color.RED, this.map, this, EntityType.CAVETHING, "Cave thing",wp);
+                Weapon wp = itemGenerator.generateWeapon();
+                monsters[found] = new Monster(x, y, 1, 1, Color.RED, this.map, this, EntityType.CAVETHING, "Cave thing", stats, wp);
                 found++;
             }
         }
     }
-    
-    public void updateInventory(){
-        String s ="";
-        for(Item i : player.inventory){
-            s = s + ", " + i.getName();
-        }
-        infopanel.updateInventory(s);
+
+    public void updateInventory() {
+        
+        infopanel.updateInventory(player.inventory);
     }
 
     public void gameOver() {
@@ -69,18 +69,19 @@ public class Game {
 
     private void setPlayerStart() {
         boolean found = false;
+        Stats stats = new Stats();
         EntityMover em = new EntityMover(EntityType.PLAYER);
         while (!found) {
             int x = 1 + rnd.nextInt(map.getWidth() - 1);
             int y = 1 + rnd.nextInt(map.getHeight() - 1);
             if (!map.blocked(em, x, y)) {
-                player = new Player(x, y, 1, 1, Color.BLUE, this.map, this, EntityType.PLAYER, "Player");
+                player = new Player(x, y, 1, 1, Color.BLUE, this.map, this, EntityType.PLAYER, "Player", stats);
                 found = true;
             }
         }
     }
 
-    public Map getMap() {
+    public WorldMap getMap() {
         return map;
     }
 
@@ -111,9 +112,9 @@ public class Game {
         infostring[1] = player.health + "/" + player.maxhealth;
         infopanel.updateInfo(infostring);
     }
-    
-    public void setCombatInfo(String s){
-        infopanel.updateCombat("\n"+s);
+
+    public void setCombatInfo(String s) {
+        infopanel.updateCombat("\n" + s);
     }
 
     public Player getPlayer() {

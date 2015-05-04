@@ -11,12 +11,18 @@ public class Weapon extends Item {
         this.rolls = rolls;
         this.range = range;
     }
-    
-    public int getRolls(){
+
+    public Weapon(Item item, int rolls, int range) {
+        super(item.getName(), item.getDescription(), item.getWeight());
+        this.rolls = rolls;
+        this.range = range;
+    }
+
+    public int getRolls() {
         return rolls;
     }
-    
-    public int getRange(){
+
+    public int getRange() {
         return range;
     }
 
