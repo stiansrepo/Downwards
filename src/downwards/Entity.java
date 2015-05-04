@@ -22,11 +22,11 @@ public class Entity {
     public int strength;
     public int defense;
     public ArrayList<Item> inventory;
+    public Weapon weapon;
     public String name;
     public boolean alive = true;
 
-    public Entity(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e) {
-
+    public Entity(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e, String name) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -35,9 +35,34 @@ public class Entity {
         this.color = color;
         this.e = e;
         this.game = game;
-
-        //map.setEntity(this, x, y);
+        this.name = name;
         inventory = new ArrayList();
+    }
+    
+    public Entity(int x, int y, int width, int height, Color color, Map map, Game game, EntityType e, String name, Weapon w) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.map = map;
+        this.color = color;
+        this.e = e;
+        this.game = game;
+        this.name = name;
+        this.weapon=weapon;
+        inventory = new ArrayList();
+    }
+
+    public void setWeapon(Weapon w) {
+        weapon = w;
+    }
+
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public void kill() {
@@ -63,7 +88,9 @@ public class Entity {
                 map.setEntity(this, x, y);
             } else if (map.getEntity(x + xs, y + ys) != null) {
                 if (map.getEntity(x + xs, y + ys).getType() != this.e) {
-                    combat(map.getEntity(x + xs, y + ys));
+                    if (map.getEntity(x + xs, y + ys).isAlive()) {
+                        combat(map.getEntity(x + xs, y + ys));
+                    }
                     xs = 0;
                     ys = 0;
                 }
@@ -79,8 +106,7 @@ public class Entity {
     }
 
     public void combat(Entity target) {
-        game.combat(this, target);
-
+        game.combatparser.combat(this, target);
     }
 
     public int getStrength() {

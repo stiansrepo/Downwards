@@ -9,5 +9,4 @@ public class Downwards {
         frame.setVisible(true);
 
     }
-
 }

@@ -52,7 +52,7 @@ public class Frame extends JFrame {
         game = new Game(infopanel);
         mappanel = new MapPanel(game);
         JPanel blank = new JPanel();
-
+       
         JLabel jl = new JLabel("blank part");
         jl.setFont(myFont);
 
@@ -60,8 +60,10 @@ public class Frame extends JFrame {
         blank.setSize(600, 100);
 
         panel.setPreferredSize(new Dimension(800, 800));
-        mappanel.setSize(600, 600);
-        infopanel.setSize(600, 100);
+        mappanel.setSize(400, 400);
+        infopanel.setPreferredSize(new Dimension(600, 100));
+
+        infopanel.setSize(600, 300);
 
         panel.setLayout(gl);
         panel.add(blank, BorderLayout.NORTH);
