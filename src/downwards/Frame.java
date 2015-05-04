@@ -18,14 +18,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class Frame extends JFrame{
+public class Frame extends JFrame {
 
     private Game game;
     private Panel panel;
-    public MapPanel mappanel;
-    private InfoPanel infopanel;
+    public MapPanel mapPanel;
+    private InfoPanel infoPanel;
 
-    public Frame(){
+    public Frame() {
         initUI();
     }
 
@@ -40,11 +40,12 @@ public class Frame extends JFrame{
         setExtendedState(MAXIMIZED_BOTH);
 
         panel = new Panel();
-        infopanel = new InfoPanel();
-        game = new Game(infopanel);
-        mappanel = new MapPanel(game);
-        mappanel.setVisible(true);
-        mappanel.setFocusable(true);
+        infoPanel = new InfoPanel(this);
+        game = new Game(infoPanel);
+
+        mapPanel = new MapPanel(game);
+        mapPanel.setVisible(true);
+        mapPanel.setFocusable(true);
 
         JPanel blank = new JPanel();
 
@@ -55,16 +56,16 @@ public class Frame extends JFrame{
         blank.setSize(600, 100);
 
         panel.setPreferredSize(new Dimension(800, 800));
-        mappanel.setSize(400, 400);
-        infopanel.setPreferredSize(new Dimension(600, 100));
+        mapPanel.setSize(400, 400);
+        infoPanel.setPreferredSize(new Dimension(600, 100));
 
-        infopanel.setSize(600, 300);
+        infoPanel.setSize(600, 300);
 
         panel.setLayout(gl);
         panel.add(blank, BorderLayout.NORTH);
 
-        panel.add(mappanel, BorderLayout.CENTER);
-        panel.add(infopanel, BorderLayout.SOUTH);
+        panel.add(mapPanel, BorderLayout.CENTER);
+        panel.add(infoPanel, BorderLayout.SOUTH);
 
         add(panel);
         pack();
@@ -72,4 +73,8 @@ public class Frame extends JFrame{
 
     }
     
+    public Game getGame(){
+        return game;
+    }
+
 }

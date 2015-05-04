@@ -11,6 +11,8 @@ public enum TileType {
     WATER,
     GRASS,
     RUBBLE,
-    FLOOR;
+    FLOOR,
+    SILT,
+    GRIT;
     
 }

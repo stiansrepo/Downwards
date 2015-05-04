@@ -1,6 +1,7 @@
 package downwards;
 
  // @author laptopng34
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MapGenerator implements MapInterface {
@@ -27,10 +28,16 @@ public class MapGenerator implements MapInterface {
         makeCaverns();
         makeCaverns();
         makeCaverns();
-        makeCaverns();
-        makeCaverns();
         createWallsAtBorders();
         fillDisjointedRooms();
+
+        generateLakes(10);
+
+        caveIn();
+        makeSilt();
+        makeStraySilt(12);
+        
+
     }
 
     private Tile[][] deepCopyTerrain() {
@@ -44,13 +51,16 @@ public class MapGenerator implements MapInterface {
     }
 
     private void fillDisjointedRooms() {
+        ArrayList<TileType> boundTypes = new ArrayList();
+        boundTypes.add(TileType.WALL);
+
         Tile[][] newterrain = deepCopyTerrain();
         boolean found = false;
         while (!found) {
             int rx = 1 + rnd.nextInt(width - 1);
             int ry = 1 + rnd.nextInt(height - 1);
             if (newterrain[rx][ry].getType() == TileType.FLOOR) {
-                floodFill(rx, ry);
+                floodFill(rx, ry, TileType.FLOOR, boundTypes);
                 if (countVisited() > 2000) {
                     for (int i = 0; i < width; i++) {
                         for (int j = 0; j < height; j++) {
@@ -60,9 +70,41 @@ public class MapGenerator implements MapInterface {
                         }
                     }
                     terrain = newterrain;
+                    clearVisited();
                     found = true;
+                } else {
+                    clearVisited();
                 }
-                else{
+            }
+
+        }
+    }
+
+    private void floodFillLake() {
+        ArrayList<TileType> boundTypes = new ArrayList();
+        boundTypes.add(TileType.WALL);
+        boundTypes.add(TileType.RUBBLE);
+        boundTypes.add(TileType.WATER);
+
+        Tile[][] newterrain = deepCopyTerrain();
+        boolean found = false;
+        while (!found) {
+            int rx = 1 + rnd.nextInt(width - 1);
+            int ry = 1 + rnd.nextInt(height - 1);
+            if (newterrain[rx][ry].getType() == TileType.FLOOR) {
+                floodFill(rx, ry, TileType.FLOOR, boundTypes);
+                if (countVisited() > 500) {
+                    for (int i = 0; i < width; i++) {
+                        for (int j = 0; j < height; j++) {
+                            if (visited[i][j]) {
+                                newterrain[i][j].setType(TileType.WATER);
+                            }
+                        }
+                    }
+                    terrain = newterrain;
+                    clearVisited();
+                    found = true;
+                } else {
                     clearVisited();
                 }
             }
@@ -79,6 +121,109 @@ public class MapGenerator implements MapInterface {
             }
         }
         return count;
+    }
+
+    private void caveIn() {
+        for (int i = 1; i < width - 1; i++) {
+            for (int j = 1; j < height - 1; j++) {
+                if (terrain[i][j].getType() == TileType.WALL) {
+                    for (int k = -1; k < 2; k++) {
+                        for (int l = -1; l < 2; l++) {
+                            if (terrain[i + k][j + l].getType() == TileType.FLOOR) {
+                                terrain[i + k][j + l].setType(TileType.RUBBLE);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void makeSilt() {
+        for (int i = 1; i < width - 1; i++) {
+            for (int j = 1; j < height - 1; j++) {
+                if (terrain[i][j].getType() == TileType.WATER) {
+                    for (int k = -1; k < 2; k++) {
+                        for (int l = -1; l < 2; l++) {
+                            if (terrain[i + k][j + l].getType() == TileType.FLOOR) {
+                                terrain[i + k][j + l].setType(TileType.SILT);
+                            } else if (terrain[i + k][j + l].getType() == TileType.RUBBLE) {
+                                terrain[i + k][j + l].setType(TileType.GRIT);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void makeStraySilt(int amt) {
+        int counter = 0;
+        while (counter < amt) {
+            for (int i = 0; i < width; i++) {
+                for (int j = 0; j < height; j++) {
+                    if (terrain[i][j].getType() == TileType.SILT) {
+                        for (int k = -1; k < 2; k++) {
+                            for (int l = -1; l < 2; l++) {
+                                if (!isOutOfBounds(i + k, j + l)) {
+                                    if (terrain[i + k][j + l].getType() == TileType.FLOOR) {
+                                        if (rnd.nextInt(100) > 85) {
+                                            terrain[i+k][j+l].setType(TileType.SILT);
+                                            counter++;
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void generateLake(int x, int y, int widthLake, int heightLake) {
+        for (int k = -1; k < widthLake; k++) {
+            for (int l = -1; l < heightLake; l++) {
+                if (!isOutOfBounds(x + k, y + l)) {
+                    //if (terrain[x + k + 1][y + l + 1].getType() == TileType.WALL) {
+                    if (findNeighbouringTiles(x + k, y + k, 2, 2, TileType.WALL) > 3) {
+
+                        return;
+                    } else {
+                        if (((k == -1) && (l == -1))
+                                || ((k == -1) && (l == heightLake - 1))
+                                || ((k == widthLake - 1) && (l == -1))
+                                || ((k == widthLake - 1) && (l == heightLake - 1))) {
+
+                        } else {
+                            terrain[x + k][y + l].setType(TileType.WATER);
+                        }
+
+                    }
+                    if (findNeighbouringTiles(x + k, y + k, 1, 1, TileType.WATER) > 3) {
+                        terrain[x + k][y + l].setType(TileType.WATER);
+                    }
+
+                }
+            }
+        }
+    }
+
+    public void generateLakes(int amt) {
+        int counter = 0;
+        int conx;
+        int cony;
+        while (counter < amt) {
+            conx = 4 + rnd.nextInt(width - 4);
+            cony = 4 + rnd.nextInt(height - 4);
+            if (terrain[conx][cony].getType() == TileType.FLOOR) {
+                generateLake(conx, cony, 2 + rnd.nextInt(5), 2 + rnd.nextInt(6));
+                counter++;
+            }
+        }
     }
 
     private void clearVisited() {
@@ -102,25 +247,28 @@ public class MapGenerator implements MapInterface {
         return visited;
     }
 
-    private void floodFill(int x, int y) {
+    private void floodFill(int x, int y, TileType type, ArrayList<TileType> boundTypes) {
         if (isOutOfBounds(x, y)) {
             return;
+
         }
         if ((visited(x, y))) {
             return;
         }
-        if (terrain[x][y].getType() == TileType.WALL) {
+
+        if (boundTypes.contains(terrain[x][y].getType())) {
             return;
+
         } else {
-            if ((terrain[x][y].getType() == TileType.FLOOR)) {
+            if ((terrain[x][y].getType() == type)) {
                 pathFinderVisited(x, y);
             }
 
         }
-        floodFill(x + 1, y);
-        floodFill(x - 1, y);
-        floodFill(x, y + 1);
-        floodFill(x, y - 1);
+        floodFill(x + 1, y, type, boundTypes);
+        floodFill(x - 1, y, type, boundTypes);
+        floodFill(x, y + 1, type, boundTypes);
+        floodFill(x, y - 1, type, boundTypes);
     }
 
     private void createWallsAtBorders() {
@@ -176,14 +324,14 @@ public class MapGenerator implements MapInterface {
         return false;
     }
 
-    private boolean isWall(int x, int y) {
+    private boolean isTile(int x, int y, TileType type) {
         if (isOutOfBounds(x, y)) {
             return false;
         }
-        return (terrain[x][y].getType() == TileType.WALL);
+        return (terrain[x][y].getType() == type);
     }
 
-    private int findNeighbouringWalls(int x, int y, int rangeX, int rangeY) {
+    private int findNeighbouringTiles(int x, int y, int rangeX, int rangeY, TileType type) {
         int startX = x - rangeX;
         int startY = y - rangeY;
         int endX = x + rangeX;
@@ -192,19 +340,19 @@ public class MapGenerator implements MapInterface {
         int iX = startX;
         int iY = startY;
 
-        int wallCounter = 0;
+        int tilesCounter = 0;
 
         for (iY = startY; iY <= endY; iY++) {
             for (iX = startX; iX <= endX; iX++) {
                 if (!(iX == x && iY == y)) {
-                    if (isWall(iX, iY)) {
-                        wallCounter += 1;
+                    if (isTile(iX, iY, type)) {
+                        tilesCounter += 1;
                     }
                 }
             }
         }
 
-        return wallCounter;
+        return tilesCounter;
     }
 
     private void makeCaverns() {
@@ -217,7 +365,7 @@ public class MapGenerator implements MapInterface {
     }
 
     private Tile placeWall(int x, int y) {
-        int numWalls = findNeighbouringWalls(x, y, 1, 1);
+        int numWalls = findNeighbouringTiles(x, y, 1, 1, TileType.WALL);
         if (terrain[x][y].getType() == TileType.WALL) {
             if (numWalls >= 4) {
                 return new Tile(x, y, TileType.WALL);

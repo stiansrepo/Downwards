@@ -10,10 +10,8 @@ public class WorldMap implements MapInterface {
     private boolean[][] visited = new boolean[WIDTH][HEIGHT];
 
     public WorldMap() {
-
-        MapGenerator mg = new MapGenerator(WIDTH,HEIGHT);
+        MapGenerator mg = new MapGenerator(WIDTH, HEIGHT);
         terrain = mg.getTerrain();
-
     }
 
     @Override
@@ -29,8 +27,8 @@ public class WorldMap implements MapInterface {
     public boolean visited(int x, int y) {
         return visited[x][y];
     }
-    
-    public boolean[][] getAllVisited(){
+
+    public boolean[][] getAllVisited() {
         return visited;
     }
 
@@ -48,10 +46,18 @@ public class WorldMap implements MapInterface {
 
         if (e == EntityType.PLAYER) {
             return (terrain[x][y].getType() != TileType.FLOOR
-                    && terrain[x][y].getType() != TileType.GRASS);
+                    && terrain[x][y].getType() != TileType.GRASS
+                    && terrain[x][y].getType() != TileType.RUBBLE
+                    && terrain[x][y].getType() != TileType.SILT
+                    && terrain[x][y].getType() != TileType.GRIT
+                    );
         }
         if (e == EntityType.CAVETHING) {
-            return terrain[x][y].getType() != TileType.FLOOR;        
+            return (terrain[x][y].getType() != TileType.FLOOR
+                    && terrain[x][y].getType() != TileType.RUBBLE
+                    && terrain[x][y].getType() != TileType.SILT
+                    && terrain[x][y].getType() != TileType.GRIT
+                    );
         }
         return true;
     }

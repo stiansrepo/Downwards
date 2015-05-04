@@ -26,4 +26,7 @@ public class Weapon extends Item {
         return range;
     }
 
+    public String getDice(){
+        return Integer.toString(rolls) +"d" + Integer.toString(range);
+    }
 }

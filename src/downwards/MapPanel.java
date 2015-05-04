@@ -19,6 +19,9 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.JPanel;
 
 public class MapPanel extends JPanel implements ComponentListener {
@@ -56,10 +59,12 @@ public class MapPanel extends JPanel implements ComponentListener {
             @Override
             public void keyTyped(KeyEvent e) {
             }
+
             @Override
             public void keyReleased(KeyEvent e) {
                 game.keyReleased(e);
             }
+
             @Override
             public void keyPressed(KeyEvent e) {
                 game.keyPressed(e);
@@ -72,21 +77,25 @@ public class MapPanel extends JPanel implements ComponentListener {
             public void mouseClicked(MouseEvent e) {
                 grabFocus();
             }
+
             @Override
             public void mousePressed(MouseEvent e) {
             }
+
             @Override
             public void mouseReleased(MouseEvent e) {
             }
+
             @Override
             public void mouseEntered(MouseEvent e) {
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
             }
         });
     }
-    
+
     public void initCam() {
         offsetMaxX = map.getWidth() - (getWidth() / scale);
         offsetMaxY = map.getHeight() - (getHeight() / scale);
@@ -111,6 +120,12 @@ public class MapPanel extends JPanel implements ComponentListener {
 
     }
 
+    public void drawMapChange(int x, int y, Color c) {
+        Graphics2D g2d = drawnMap.createGraphics();
+        g2d.setColor(c);
+        g2d.fillRect(x, y, 1, 1);
+    }
+
     private void drawMap() {
         drawnMap = new BufferedImage(map.getWidth(), map.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = drawnMap.createGraphics();
@@ -120,13 +135,25 @@ public class MapPanel extends JPanel implements ComponentListener {
                 TileType t = map.getTile(i, j).getType();
                 switch (t) {
                     case FLOOR:
-                        g2d.setColor(Color.GRAY);
+                        g2d.setColor(new Color(153, 153, 153));
+                        break;
+                    case RUBBLE:
+                        g2d.setColor(new Color(93, 93, 93));
+                        break;
+                    case SILT:
+                        g2d.setColor(new Color (238,209,141));
                         break;
                     case GRASS:
-                        g2d.setColor(Color.GREEN);
+                        g2d.setColor(new Color(109, 185, 66));
+                        break;
+                    case GRIT:
+                        g2d.setColor(new Color(129,122,105));
                         break;
                     case WALL:
                         g2d.setColor(Color.BLACK);
+                        break;
+                    case WATER:
+                        g2d.setColor(new Color(84, 123, 185));
                         break;
                     default:
                         break;
@@ -149,10 +176,18 @@ public class MapPanel extends JPanel implements ComponentListener {
         g2d.scale(scale, scale);
         g2d.translate(-camX, -camY);
         g2d.drawImage(drawnMap, null, this);
-        player.paint(g2d);
+
         for (Monster m : monsters) {
             m.paint(g2d);
         }
+        player.paint(g2d);
+        List<Node> keys = new ArrayList<>(game.getChangeMap().keySet());
+        Iterator iterator = keys.iterator();
+        while (iterator.hasNext()) {
+            Node n = (Node) iterator.next();
+            drawMapChange(n.getX(), n.getY(), game.getChangeMap().get(n));
+        }
+        game.clearChangeMap();
 
         g2d.translate(camX, camY);
 

@@ -1,22 +1,27 @@
 package downwards;
 
 import java.awt.Color;
+import java.util.Random;
 
 public class Monster extends Entity {
 
     private Player player;
     private WorldMap map;
+    private Game game;
+    private Random rnd;
 
     public Monster(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) {
         super(x, y, width, height, color, map, game, e, name, stats);
         maxhealth = 20;
-        health = maxhealth;     
-        player = game.player;
+        health = maxhealth;
+        player = game.getPlayer();
         ys = 0;
         xs = 0;
-        this.stats=stats;
+        this.stats = stats;
         this.map = map;
         weapon = new Weapon("Bare hands", "aw", 1, 1, 2);
+        this.game = game;
+        rnd = new Random();
     }
 
     public Monster(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats, Weapon weapon) {
@@ -27,6 +32,36 @@ public class Monster extends Entity {
         ys = 0;
         xs = 0;
         this.map = map;
+        this.weapon = weapon;
+        inventory.add(weapon);
+        this.game = game;
+        rnd = new Random();
+    }
+
+    public Monster(int x, int y, int width, int height, WorldMap map, Game game, Monster monster) {
+        super(x, y, width, height, map, game, monster);
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.map = map;
+        this.game = game;
+        this.player = game.getPlayer();
+        this.color = monster.color;
+        this.e = monster.e;
+        this.name = monster.name;
+        this.stats = monster.stats;
+        this.weapon = monster.weapon;
+        inventory = monster.inventory;
+        rnd = new Random();
+    }
+
+    public Monster(Color color, EntityType e, String name, Stats stats, Weapon weapon) {
+        super(color, e, name, stats, weapon);
+        maxhealth = 20;
+        health = maxhealth;
+        ys = 0;
+        xs = 0;
         this.weapon = weapon;
         inventory.add(weapon);
     }
@@ -73,8 +108,15 @@ public class Monster extends Entity {
                  }*/
             }
         } else {
-            xs = 0;
-            ys = 0;
+            xs = -1 + rnd.nextInt(3);
+            ys = -1 + rnd.nextInt(3);
+        }
+    }
+
+    public void interactWithTile() {
+        if (map.getTile(x, y).getType() == TileType.RUBBLE) {
+            map.getTile(x, y).setType(TileType.FLOOR);
+            game.drawMapChange(x, y, new Color(153, 153, 153));
         }
     }
 }

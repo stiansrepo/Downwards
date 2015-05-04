@@ -58,6 +58,30 @@ public class Entity {
         inventory = new CopyOnWriteArrayList();
     }
 
+    public Entity(Color color, EntityType e, String name, Stats stats, Weapon weapon) {
+        this.color = color;
+        this.e = e;
+        this.name = name;
+        this.stats = stats;
+        this.weapon = weapon;
+        inventory = new CopyOnWriteArrayList();
+    }
+
+    public Entity(int x, int y, int width, int height, WorldMap map, Game game, Monster monster) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.map = map;
+        this.game = game;
+        this.color = monster.color;
+        this.e = monster.e;
+        this.name = monster.name;
+        this.stats = monster.stats;
+        this.weapon = monster.weapon;
+        inventory = monster.inventory;
+    }
+
     public Entity(Entity entity) {
         this.x = entity.x;
         this.y = entity.y;

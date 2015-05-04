@@ -17,7 +17,7 @@ public class Player extends Entity {
         this.stats = stats;
         weapon = new Weapon("Great Axe", "Smash!", 12, 1, 8);
         this.game = game;
-        
+
     }
 
     public void keyReleased(KeyEvent e) {
@@ -41,20 +41,33 @@ public class Player extends Entity {
         }
     }
 
+    public void equipWeapon(Weapon w) {
+        if (inventory.contains(w)) {
+            inventory.add(weapon);
+            weapon = w;
+            inventory.remove(w);
+        }
+        game.updateInventory();
+    }
+
     public void keyPressed(KeyEvent e) {
         switch (e.getKeyCode()) {
 
             case KeyEvent.VK_A:
                 xs = -1;
+                game.move();
                 break;
             case KeyEvent.VK_D:
                 xs = 1;
+                game.move();
                 break;
             case KeyEvent.VK_W:
                 ys = -1;
+                game.move();
                 break;
             case KeyEvent.VK_S:
                 ys = 1;
+                game.move();
                 break;
             case KeyEvent.VK_L:
                 loot();
@@ -63,14 +76,14 @@ public class Player extends Entity {
     }
 
     public void loot() {
-        if (standingOn!=null) {
+        if (standingOn != null) {
             Iterator iterator = standingOn.inventory.iterator();
             while (iterator.hasNext()) {
-                this.inventory.add((Item)iterator.next());                               
+                this.inventory.add((Item) iterator.next());
             }
             standingOn.inventory.clear();
             game.updateInventory();
         }
-        
+
     }
 }

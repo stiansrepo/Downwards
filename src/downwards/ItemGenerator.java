@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Random;
 
 public class ItemGenerator {
-
     
     Map<String, String> weaponStrings = Collections.synchronizedMap(new HashMap<String, String>());
 
@@ -36,7 +35,8 @@ public class ItemGenerator {
 
     public Weapon generateWeapon() {
         Weapon weapon;
-        weapon = new Weapon(generateItem(Type.WEAPON), 1, 2);
+        Random rnd = new Random();
+        weapon = new Weapon(generateItem(Type.WEAPON), 1+rnd.nextInt(2), 2+rnd.nextInt(2));
         return weapon;
     }
 

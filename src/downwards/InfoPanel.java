@@ -4,13 +4,18 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.ListSelectionModel;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -26,49 +31,36 @@ public class InfoPanel extends JPanel {
     private JTextArea combat;
     private JScrollPane jsp;
     private JScrollPane jspinv;
+    private JButton inspect;
+    private JButton equip;
+    private Frame frame;
 
-    public InfoPanel() {
+    private GridBagConstraints turnc = new GridBagConstraints();
+    private GridBagConstraints healthc = new GridBagConstraints();
+    private GridBagConstraints combatc = new GridBagConstraints();
+    private GridBagConstraints inventoryc = new GridBagConstraints();
+    private GridBagConstraints inspectc = new GridBagConstraints();
+    private GridBagConstraints equipc = new GridBagConstraints();
 
-        GridBagConstraints turnc = new GridBagConstraints();
-        GridBagConstraints healthc = new GridBagConstraints();
-        GridBagConstraints combatc = new GridBagConstraints();
-        GridBagConstraints inventoryc = new GridBagConstraints();
-        turnc.gridheight = 1;
-        turnc.gridwidth = 1;
-        turnc.gridx = 0;
-        turnc.gridy = 0;
-        turnc.anchor = GridBagConstraints.FIRST_LINE_START;
-        turnc.weightx = 0;
-        healthc.gridheight = 1;
-        healthc.gridwidth = 1;
-        healthc.gridx = 0;
-        healthc.gridy = 1;
-        healthc.weightx = 0;
-        healthc.anchor = GridBagConstraints.LINE_START;
-
-        inventoryc.gridheight = 2;
-        inventoryc.gridwidth = 1;
-        inventoryc.gridx = 5;
-        inventoryc.gridy = 0;
-        inventoryc.weightx = 0;
-        inventoryc.anchor = GridBagConstraints.FIRST_LINE_END;
-
-        combatc.gridheight = 2;
-        combatc.gridwidth = 2;
-        combatc.gridx = 2;
-        combatc.gridy = 0;
-        combatc.anchor = GridBagConstraints.PAGE_START;
-        combatc.weightx = 0.5;
+    public InfoPanel(Frame frame) {
+        this.frame = frame;
         GridBagLayout layout = new GridBagLayout();
-
+        setConstraints();
         setLayout(layout);
+
+        inspect = new JButton("Inspect");
+        equip = new JButton("Equip");
+        addButtonStuff();
+        inspect.setFocusable(false);
+        equip.setFocusable(false);
 
         turn = new JLabel("Turn: 0");
         health = new JLabel("Health: 100/100");
         combat = new JTextArea("");
         invListModel = new DefaultListModel();
         inventory = new JList(invListModel);
-
+        inventory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        inventory.setFocusable(false);
         inventory.setSize(new Dimension(100, 80));
 
         combat.setEditable(false);
@@ -91,7 +83,78 @@ public class InfoPanel extends JPanel {
         add(health, healthc);
         add(jsp, combatc);
         add(jspinv, inventoryc);
+        add(inspect, inspectc);
+        add(equip, equipc);
 
+    }
+
+    public void setConstraints() {
+        turnc.gridheight = 1;
+        turnc.gridwidth = 1;
+        turnc.gridx = 0;
+        turnc.gridy = 0;
+        turnc.anchor = GridBagConstraints.FIRST_LINE_START;
+        turnc.weightx = 0;
+
+        healthc.gridheight = 1;
+        healthc.gridwidth = 1;
+        healthc.gridx = 0;
+        healthc.gridy = 1;
+        healthc.weightx = 0;
+        healthc.anchor = GridBagConstraints.LINE_START;
+
+        combatc.gridheight = 2;
+        combatc.gridwidth = 2;
+        combatc.gridx = 2;
+        combatc.gridy = 0;
+        combatc.anchor = GridBagConstraints.PAGE_START;
+        combatc.weightx = 0.5;
+
+        inspectc.gridheight = 1;
+        inspectc.gridwidth = 1;
+        inspectc.gridx = 5;
+        inspectc.gridy = 1;
+        inspectc.weightx = 0.74;
+        inspectc.anchor = GridBagConstraints.LINE_END;
+
+        equipc.gridheight = 1;
+        equipc.gridwidth = 1;
+        equipc.gridx = 5;
+        equipc.gridy = 0;
+        equipc.weightx = 0.74;
+        equipc.anchor = GridBagConstraints.LINE_END;
+
+        inventoryc.gridheight = 2;
+        inventoryc.gridwidth = 2;
+        inventoryc.gridx = 6;
+        inventoryc.gridy = 0;
+        inventoryc.weightx = 0.75;
+        inventoryc.anchor = GridBagConstraints.FIRST_LINE_END;
+
+    }
+
+    public void addButtonStuff() {
+        inspect.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (inventory.getSelectedIndex() != -1) {
+                    Weapon w = (Weapon)frame.getGame().player.inventory.get(inventory.getSelectedIndex());
+                    String desc = w.getDescription();
+                    String dmg = w.getDice();
+                    String total = desc + "\n" + dmg + " damage.";
+                    JOptionPane.showMessageDialog(null, total);
+                }
+            }
+        });
+        equip.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (inventory.getSelectedIndex() != -1) {
+                    frame.getGame().player.equipWeapon((Weapon) frame.getGame().player.inventory.get(inventory.getSelectedIndex()));
+
+                }
+            }
+        });
     }
 
     public void updateInfo(String[] info) {
@@ -111,7 +174,7 @@ public class InfoPanel extends JPanel {
 
     public void updateInventory(List<Item> s) {
         invListModel.clear();
-        for(Item i : s){
+        for (Item i : s) {
             String ss = i.getName();
             invListModel.addElement(ss);
         }
