@@ -177,6 +177,14 @@ public class Entity {
         return defense;
     }
 
+    public void levelUp(){
+        stats.levelUp();
+    }
+    
+    public void gainXp(int gained){
+        getStats().setXp(getStats().getXp()+gained);
+    }
+    
     public void paint(Graphics2D g2d) {
         if (alive) {
             g2d.setColor(color);

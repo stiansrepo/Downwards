@@ -9,12 +9,15 @@ import java.util.Random;
 
 public class Game {
 
+    public Frame frame;
     public WorldMap map;
     public Player player;
     public Monster[] monsters;
+    public Chest[] chests;
     public Random rnd;
     public int turn;
     private InfoPanel infoPanel;
+    private MapPanel mapPanel;
     private boolean gameOver = false;
     private String[] infostring;
     private ItemGenerator itemGenerator;
@@ -22,9 +25,9 @@ public class Game {
     public CombatParser combatparser;
     private Map<Node, Color> changeMap;
 
-    public Game(InfoPanel infoPanel) {
+    public Game(Frame frame) {
+        this.frame=frame;
         changeMap = new HashMap();
-        this.infoPanel = infoPanel;
         itemGenerator = new ItemGenerator();
         monsterGenerator = new MonsterGenerator();
         combatparser = new CombatParser(this);
@@ -32,7 +35,18 @@ public class Game {
         rnd = new Random();
         map = new WorldMap();
         setPlayerStart();
+        placeChests(20);
         setMonsterStart(25);
+        
+    }
+    
+    public void initPanels(){
+        this.infoPanel = frame.getInfoPanel();
+        this.mapPanel = frame.getMapPanel();
+    }
+    
+    public Chest[] getChests(){
+        return chests;
     }
     
     public Player getPlayer(){
@@ -41,6 +55,8 @@ public class Game {
 
     public void drawMapChange(int x, int y, Color c) {
         changeMap.put(new Node(x, y), c);
+        mapPanel.drawMapChange(x, y, c);
+        clearChangeMap();
     }
 
     public void clearChangeMap() {
@@ -63,20 +79,32 @@ public class Game {
         monsters = new Monster[amt];
         int found = 0;
         EntityMover em = new EntityMover(EntityType.CAVETHING);
-        Stats stats = new Stats();
         while (found < amt) {
             int x = 1 + rnd.nextInt(map.getWidth() - 1);
             int y = 1 + rnd.nextInt(map.getHeight() - 1);
             if (!map.blocked(em, x, y)) {
                 Weapon wp = itemGenerator.generateWeapon();
-                //monsters[found] = new Monster(x, y, 1, 1, Color.RED, this.map, this, EntityType.CAVETHING, "Cave thing", stats, wp);
                 monsters[found] = new Monster(x, y, 1, 1, this.map, this,monsterGenerator.generateMonster());
-                
                 found++;
             }
         }
     }
 
+    private void placeChests(int amt) {
+        chests = new Chest[amt];
+        int found = 0;
+        while (found < amt) {
+            int x = 4 + rnd.nextInt(map.getWidth() - 8);
+            int y = 4 + rnd.nextInt(map.getHeight() - 8);
+            if (!map.blockedThing(ThingType.CHEST, x, y)) {
+                Weapon wp = itemGenerator.generateWeapon();
+                Chest chest = new Chest(x,y,ThingType.CHEST,true,map,this);
+                chest.addContents(wp);
+                chests[found] = chest;
+                found++;
+            }
+        }
+    }
     public void updateInventory() {
 
         infoPanel.updateInventory(player.inventory);
@@ -92,7 +120,7 @@ public class Game {
 
     private void setPlayerStart() {
         boolean found = false;
-        Stats stats = new Stats();
+        Stats stats = new Stats(1, 0, 40, 8, 10, 10, 8, 10);
         EntityMover em = new EntityMover(EntityType.PLAYER);
         while (!found) {
             int x = 1 + rnd.nextInt(map.getWidth() - 1);
@@ -117,7 +145,15 @@ public class Game {
                 m.interactWithTile();
             }
         }
+        if(player.getStats().getXp()>player.getStats().getLevel()*player.getStats().getLevel()*500){
+            levelUp();
+        }
         endTurn();
+    }
+    
+    private void levelUp(){
+        player.getStats().levelUp();
+        setCombatInfo(player.name + " has reached level " + player.getStats().getLevel()+"!");
     }
 
     public int getTurn() {

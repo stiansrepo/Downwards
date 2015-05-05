@@ -24,14 +24,15 @@ public class MapGenerator implements MapInterface {
     private void generateMap() {
         randomFill(49);
         makeCaverns();
+        
         makeCaverns();
         makeCaverns();
         makeCaverns();
         makeCaverns();
-        createWallsAtBorders();
         fillDisjointedRooms();
+        createWallsAtBorders();
 
-        generateLakes(10);
+        generateLakes(12);
 
         caveIn();
         makeSilt();
@@ -61,7 +62,7 @@ public class MapGenerator implements MapInterface {
             int ry = 1 + rnd.nextInt(height - 1);
             if (newterrain[rx][ry].getType() == TileType.FLOOR) {
                 floodFill(rx, ry, TileType.FLOOR, boundTypes);
-                if (countVisited() > 2000) {
+                if (countVisited() > 2200) {
                     for (int i = 0; i < width; i++) {
                         for (int j = 0; j < height; j++) {
                             if (!visited[i][j]) {

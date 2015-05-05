@@ -29,7 +29,7 @@ public class MonsterGenerator {
         String name = names.get(rnd.nextInt(names.size()));
         Stats stat = stats.get(rnd.nextInt(stats.size()));
         Weapon weapon = weapons.get(rnd.nextInt(weapons.size()));
-        Monster m = new Monster(c, et, name, stat, weapon);
+        Monster m = new Monster(c, et, name, stat, weapon,2);
         return m;
     }
 
@@ -37,6 +37,9 @@ public class MonsterGenerator {
         colors.add(new Color(3, 155, 50));
         colors.add(new Color(10, 135, 100));
         colors.add(new Color(35, 195, 130));
+        colors.add(new Color(95, 155, 50));
+        colors.add(new Color(105, 125, 130));
+        colors.add(new Color(5, 105, 15));
     }
 
     private void addEntities() {
@@ -51,7 +54,7 @@ public class MonsterGenerator {
     }
 
     private void addStats() {
-        stats.add(new Stats());
+        stats.add(new Stats(1, 1, 10, 3, 5, 8, 2, 1));
     }
 
     private void addWeapons() {

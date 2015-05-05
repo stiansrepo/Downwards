@@ -23,6 +23,7 @@ import javax.swing.text.DefaultCaret;
  */
 public class InfoPanel extends JPanel {
 
+    private Frame frame;
     private String res = "";
     private JLabel turn;
     private JLabel health;
@@ -33,7 +34,6 @@ public class InfoPanel extends JPanel {
     private JScrollPane jspinv;
     private JButton inspect;
     private JButton equip;
-    private Frame frame;
 
     private GridBagConstraints turnc = new GridBagConstraints();
     private GridBagConstraints healthc = new GridBagConstraints();
@@ -44,6 +44,7 @@ public class InfoPanel extends JPanel {
 
     public InfoPanel(Frame frame) {
         this.frame = frame;
+
         GridBagLayout layout = new GridBagLayout();
         setConstraints();
         setLayout(layout);
@@ -88,48 +89,58 @@ public class InfoPanel extends JPanel {
 
     }
 
+    public void init() {
+
+    }
+
     public void setConstraints() {
-        turnc.gridheight = 1;
+        turnc.gridheight = 2;
         turnc.gridwidth = 1;
         turnc.gridx = 0;
         turnc.gridy = 0;
         turnc.anchor = GridBagConstraints.FIRST_LINE_START;
         turnc.weightx = 0;
-
-        healthc.gridheight = 1;
+        turnc.weighty= 0;
+        
+        healthc.gridheight = 2;
         healthc.gridwidth = 1;
         healthc.gridx = 0;
-        healthc.gridy = 1;
+        healthc.gridy = 0;
         healthc.weightx = 0;
+        healthc.weighty = 0;
         healthc.anchor = GridBagConstraints.LINE_START;
 
-        combatc.gridheight = 2;
-        combatc.gridwidth = 2;
+        combatc.gridheight = 4;
+        combatc.gridwidth = 4;
         combatc.gridx = 2;
         combatc.gridy = 0;
-        combatc.anchor = GridBagConstraints.PAGE_START;
+        combatc.anchor = GridBagConstraints.CENTER;
         combatc.weightx = 0.5;
+        combatc.weighty = 0.5;
 
-        inspectc.gridheight = 1;
+        inspectc.gridheight = 2;
         inspectc.gridwidth = 1;
-        inspectc.gridx = 5;
-        inspectc.gridy = 1;
-        inspectc.weightx = 0.74;
+        inspectc.gridx = 7;
+        inspectc.gridy = 0;
+        inspectc.weighty = 0.5;
+        inspectc.weightx = 0.2;
         inspectc.anchor = GridBagConstraints.LINE_END;
 
-        equipc.gridheight = 1;
+        equipc.gridheight = 2;
         equipc.gridwidth = 1;
-        equipc.gridx = 5;
-        equipc.gridy = 0;
-        equipc.weightx = 0.74;
+        equipc.gridx = 7;
+        equipc.gridy = 2;
+        equipc.weightx = 0.2;
+        equipc.weighty = 0.5;
         equipc.anchor = GridBagConstraints.LINE_END;
 
-        inventoryc.gridheight = 2;
+        inventoryc.gridheight = 4;
         inventoryc.gridwidth = 2;
-        inventoryc.gridx = 6;
+        inventoryc.gridx = 9;
         inventoryc.gridy = 0;
-        inventoryc.weightx = 0.75;
-        inventoryc.anchor = GridBagConstraints.FIRST_LINE_END;
+        inventoryc.weighty = 0.5;
+        inventoryc.weightx = 0.1;
+        inventoryc.anchor = GridBagConstraints.LINE_START;
 
     }
 
@@ -138,24 +149,38 @@ public class InfoPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (inventory.getSelectedIndex() != -1) {
-                    Item w = (Item) frame.getGame().player.inventory.get(inventory.getSelectedIndex());
-                    String desc = w.getDescription();
-                    String total = desc + "\n";
+                    String total = "";
+                    String desc = "";
+                    Object o = (Object) frame.getGame().player.inventory.get(inventory.getSelectedIndex());
+                    if (o instanceof Item) {
+                        Item i = (Item) o;
+                        desc = i.getDescription();
+                        total = desc;
+                    }
+                    if (o instanceof Weapon) {
+                        Weapon w = (Weapon) o;
+                        desc = w.getDescription() + "\n" + w.getDice() + " damage.";
+                        total = desc;
+                    }
                     JOptionPane.showMessageDialog(null, total);
                 }
             }
-        });
-        equip.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (inventory.getSelectedIndex() != -1) {
-                    Object o = frame.getGame().player.inventory.get(inventory.getSelectedIndex());
-                    if(o instanceof Weapon) {
-                     frame.getGame().player.equipWeapon((Weapon)(frame.getGame().player.inventory.get(inventory.getSelectedIndex())));
+        }
+        );
+        equip.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e
+                    ) {
+                        if (inventory.getSelectedIndex() != -1) {
+                            Object o = frame.getGame().player.inventory.get(inventory.getSelectedIndex());
+                            if (o instanceof Weapon) {
+                                frame.getGame().player.equipWeapon((Weapon) (frame.getGame().player.inventory.get(inventory.getSelectedIndex())));
+                            }
+                        }
                     }
                 }
-            }
-        });
+        );
     }
 
     public void updateInfo(String[] info) {

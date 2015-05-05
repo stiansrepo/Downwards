@@ -9,10 +9,11 @@ package downwards;
  *
  * @author laptopng34
  */
-public enum ObjectType {
-    
-    DOOR,
-    CHEST,
-    TRAP;
+public enum ItemType {
+
+    RUBBISH,
+    WEAPON,
+    POTION,
+    KEY;
     
 }

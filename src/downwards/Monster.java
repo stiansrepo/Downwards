@@ -49,6 +49,8 @@ public class Monster extends Entity {
         this.player = game.getPlayer();
         this.color = monster.color;
         this.e = monster.e;
+        this.maxhealth=monster.maxhealth;
+        this.health=monster.health;
         this.name = monster.name;
         this.stats = monster.stats;
         this.weapon = monster.weapon;
@@ -56,10 +58,10 @@ public class Monster extends Entity {
         rnd = new Random();
     }
 
-    public Monster(Color color, EntityType e, String name, Stats stats, Weapon weapon) {
+    public Monster(Color color, EntityType e, String name, Stats stats, Weapon weapon, int hp) {
         super(color, e, name, stats, weapon);
-        maxhealth = 20;
-        health = maxhealth;
+        this.maxhealth = hp;
+        this.health = maxhealth;
         ys = 0;
         xs = 0;
         this.weapon = weapon;
@@ -117,7 +119,7 @@ public class Monster extends Entity {
         if (map.getTile(x, y).getType() == TileType.RUBBLE) {
             map.getTile(x, y).setType(TileType.FLOOR);
             game.drawMapChange(x, y, new Color(153, 153, 153));
-            inventory.add(new Item("Gold lump","Lumps of gold mined by the company.",1));
+            inventory.add(new Item("Gold lump","Lumps of gold mined by the company.",1, ItemType.RUBBISH));
         }
     }
 }

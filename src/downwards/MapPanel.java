@@ -6,18 +6,12 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -26,6 +20,7 @@ import javax.swing.JPanel;
 
 public class MapPanel extends JPanel implements ComponentListener {
 
+    private Frame frame;
     private BufferedImage drawnMap;
     private int offsetMaxX;
     private int offsetMaxY;
@@ -35,16 +30,17 @@ public class MapPanel extends JPanel implements ComponentListener {
     private int camY;
     private WorldMap map;
     private Game game;
-    private final int scale = 25;
+    private final int scale = 23;
     private Player player;
     private Monster[] monsters;
 
-    public MapPanel(Game game) {
+    public MapPanel(Frame frame) {
+        this.frame=frame;
+        this.game=frame.getGame();
         addListeners();
         this.addComponentListener(this);
         setFocusable(true);
-
-        this.game = game;
+        
         player = game.getPlayer();
         map = game.getMap();
         player = game.getPlayer();
@@ -52,6 +48,10 @@ public class MapPanel extends JPanel implements ComponentListener {
         offsetMaxX = map.getWidth() - getWidth();
         offsetMaxY = map.getHeight() - getHeight();
         drawMap();
+    }
+    
+    private void init(){
+        this.game = frame.getGame();
     }
 
     private void addListeners() {
@@ -132,32 +132,49 @@ public class MapPanel extends JPanel implements ComponentListener {
 
         for (int i = 0; i < map.getWidth(); i++) {
             for (int j = 0; j < map.getHeight(); j++) {
-                TileType t = map.getTile(i, j).getType();
-                switch (t) {
-                    case FLOOR:
-                        g2d.setColor(new Color(153, 153, 153));
-                        break;
-                    case RUBBLE:
-                        g2d.setColor(new Color(93, 93, 93));
-                        break;
-                    case SILT:
-                        g2d.setColor(new Color (238,209,141));
-                        break;
-                    case GRASS:
-                        g2d.setColor(new Color(109, 185, 66));
-                        break;
-                    case GRIT:
-                        g2d.setColor(new Color(129,122,105));
-                        break;
-                    case WALL:
-                        g2d.setColor(Color.BLACK);
-                        break;
-                    case WATER:
-                        g2d.setColor(new Color(84, 123, 185));
-                        break;
-                    default:
-                        break;
+                if (map.getThing(i, j) == null) {
+                    TileType t = map.getTile(i, j).getType();
+                    switch (t) {
+                        case FLOOR:
+                            g2d.setColor(new Color(153, 153, 153));
+                            break;
+                        case RUBBLE:
+                            g2d.setColor(new Color(93, 93, 93));
+                            break;
+                        case SILT:
+                            g2d.setColor(new Color(206, 187, 67));
+                            break;
+                        case GRASS:
+                            g2d.setColor(new Color(109, 185, 66));
+                            break;
+                        case GRIT:
+                            g2d.setColor(new Color(138,114,87));
+                            break;
+                        case WALL:
+                            g2d.setColor(Color.BLACK);
+                            break;
+                        case WATER:
+                            g2d.setColor(new Color(24, 24, 195));
+                            break;
+                        default:
+                            break;
 
+                    }
+                } else {
+                    ThingType t = map.getThing(i, j).getType();
+                    switch (t) {
+                        case CHEST:
+                            Chest c = (Chest)map.getThing(i, j);
+                            if(c.isEmpty()){
+                                g2d.setColor(new Color(190, 190, 0));
+                            }
+                            else{
+                                g2d.setColor(new Color(240, 240, 0));
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
                 g2d.fillRect(i, j, 1, 1);
             }
@@ -181,14 +198,6 @@ public class MapPanel extends JPanel implements ComponentListener {
             m.paint(g2d);
         }
         player.paint(g2d);
-        List<Node> keys = new ArrayList<>(game.getChangeMap().keySet());
-        Iterator iterator = keys.iterator();
-        while (iterator.hasNext()) {
-            Node n = (Node) iterator.next();
-            drawMapChange(n.getX(), n.getY(), game.getChangeMap().get(n));
-        }
-        game.clearChangeMap();
-
         g2d.translate(camX, camY);
 
         if (game.getGameOver()) {

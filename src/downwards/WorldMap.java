@@ -5,6 +5,7 @@ public class WorldMap implements MapInterface {
 
     public final int WIDTH = 100;
     public final int HEIGHT = 100;
+    private Thing[][] things = new Thing[WIDTH][HEIGHT];
     private Tile[][] terrain = new Tile[WIDTH][HEIGHT];
     private Entity[][] entities = new Entity[WIDTH][HEIGHT];
     private boolean[][] visited = new boolean[WIDTH][HEIGHT];
@@ -37,9 +38,27 @@ public class WorldMap implements MapInterface {
         visited[x][y] = true;
     }
 
+    public boolean blockedThing(ThingType t, int xt, int yt) {
+        for (int i = -2; i < 3; i++) {
+            for (int j = -2; j < 3; j++) {
+                if (getThing(xt+i, yt+j) != null) {
+                    return true;
+                }
+            }
+        }
+        if (t == ThingType.CHEST) {
+            return (terrain[xt][yt].getType() != TileType.FLOOR
+                    && terrain[xt][yt].getType() != TileType.GRASS
+                    && terrain[xt][yt].getType() != TileType.RUBBLE
+                    && terrain[xt][yt].getType() != TileType.SILT
+                    && terrain[xt][yt].getType() != TileType.GRIT);
+        }
+        return true;
+    }
+
     @Override
     public boolean blocked(Mover mover, int x, int y) {
-        if (getEntity(x, y) != null) {
+        if (getEntity(x, y) != null || getThing(x, y) != null) {
             return true;
         }
         EntityType e = ((EntityMover) mover).getType();
@@ -49,15 +68,13 @@ public class WorldMap implements MapInterface {
                     && terrain[x][y].getType() != TileType.GRASS
                     && terrain[x][y].getType() != TileType.RUBBLE
                     && terrain[x][y].getType() != TileType.SILT
-                    && terrain[x][y].getType() != TileType.GRIT
-                    );
+                    && terrain[x][y].getType() != TileType.GRIT);
         }
         if (e == EntityType.CAVETHING) {
             return (terrain[x][y].getType() != TileType.FLOOR
                     && terrain[x][y].getType() != TileType.RUBBLE
                     && terrain[x][y].getType() != TileType.SILT
-                    && terrain[x][y].getType() != TileType.GRIT
-                    );
+                    && terrain[x][y].getType() != TileType.GRIT);
         }
         return true;
     }
@@ -73,6 +90,14 @@ public class WorldMap implements MapInterface {
 
     public void setEntity(Entity e, int x, int y) {
         entities[x][y] = e;
+    }
+
+    public Thing getThing(int x, int y) {
+        return things[x][y];
+    }
+
+    public void setThing(Thing t, int x, int y) {
+        things[x][y] = t;
     }
 
     public void clearVisited() {

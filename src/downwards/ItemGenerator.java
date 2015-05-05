@@ -28,7 +28,7 @@ public class ItemGenerator {
                 String randomKey = keys.get(rnd.nextInt(keys.size()));
                 String name = randomKey;
                 String description = weaponStrings.get(randomKey);
-                item = new Item(name, description, 1);
+                item = new Item(name, description, 1,ItemType.WEAPON);
         }
         return item;
     }
@@ -36,7 +36,7 @@ public class ItemGenerator {
     public Weapon generateWeapon() {
         Weapon weapon;
         Random rnd = new Random();
-        weapon = new Weapon(generateItem(Type.WEAPON), 1+rnd.nextInt(2), 2+rnd.nextInt(2));
+        weapon = new Weapon(generateItem(Type.WEAPON), 1+rnd.nextInt(2), 2+rnd.nextInt(6));
         return weapon;
     }
 

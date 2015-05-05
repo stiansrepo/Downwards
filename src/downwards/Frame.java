@@ -4,16 +4,6 @@ package downwards;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.GraphicsEnvironment;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -38,12 +28,11 @@ public class Frame extends JFrame {
         setTitle("Downwards! Pre-Alpha version");
 
         setExtendedState(MAXIMIZED_BOTH);
-
         panel = new Panel();
+        game = new Game(this);
         infoPanel = new InfoPanel(this);
-        game = new Game(infoPanel);
-
-        mapPanel = new MapPanel(game);
+        mapPanel = new MapPanel(this);
+        game.initPanels();
         mapPanel.setVisible(true);
         mapPanel.setFocusable(true);
 
@@ -72,9 +61,17 @@ public class Frame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }
-    
-    public Game getGame(){
+
+    public Game getGame() {
         return game;
+    }
+
+    public InfoPanel getInfoPanel() {
+        return infoPanel;
+    }
+
+    public MapPanel getMapPanel() {
+        return mapPanel;
     }
 
 }

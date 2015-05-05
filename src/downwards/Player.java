@@ -38,16 +38,9 @@ public class Player extends Entity {
                 break;
             case KeyEvent.VK_L:
                 break;
+            case KeyEvent.VK_O:
+                break;
         }
-    }
-
-    public void equipWeapon(Weapon w) {
-        if (inventory.contains(w)) {
-            inventory.add(weapon);
-            weapon = w;
-            inventory.remove(w);
-        }
-        game.updateInventory();
     }
 
     public void keyPressed(KeyEvent e) {
@@ -72,7 +65,19 @@ public class Player extends Entity {
             case KeyEvent.VK_L:
                 loot();
                 break;
+            case KeyEvent.VK_O:
+                lootChest();
+                break;
         }
+    }
+
+    public void equipWeapon(Weapon w) {
+        if (inventory.contains(w)) {
+            inventory.add(weapon);
+            weapon = w;
+            inventory.remove(w);
+        }
+        game.updateInventory();
     }
 
     public void loot() {
@@ -84,6 +89,20 @@ public class Player extends Entity {
             standingOn.inventory.clear();
             game.updateInventory();
         }
+    }
 
+    public void lootChest() {
+        for (int k = -1; k < 2; k++) {
+            for (int l = -1; l < 2; l++) {
+                if (game.getMap().getThing(x + k, y + l) != null) {
+                    if (game.getMap().getThing(x + k, y + l).getType() == ThingType.CHEST) {
+                        Chest chest = (Chest) game.getMap().getThing(x + k, y + l);
+                        this.inventory.addAll(chest.getItems());
+                        game.updateInventory();
+                        game.drawMapChange(x+k, y+l, new Color(190, 190, 0));
+                    }
+                }
+            }
+        }
     }
 }

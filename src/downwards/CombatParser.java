@@ -17,10 +17,14 @@ public class CombatParser {
     }
 
     public void combat(Entity attacker, Entity target) {
-        int dmg = Dice.rollWeapon(attacker.getWeapon());
+        float str = attacker.getStats().getStr();
+        float pct = 0.1f;
+        int statsDmg = Math.round(str*pct);
+        int dmg = Dice.rollWeapon(attacker.getWeapon()) + statsDmg;
         target.takeDamage(dmg);
         combatLine = attacker.name + "'s " + attacker.getWeapon().getName().toLowerCase() + " deals " + dmg + " damage to " + target.name + "!";
         if (!target.isAlive()) {
+            attacker.gainXp(target.getStats().getXpValue());
             combatLine =combatLine + "\n" + target.name + " falls screaming to its death!";
         }
         game.setCombatInfo(combatLine);
