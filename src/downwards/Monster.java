@@ -117,6 +117,7 @@ public class Monster extends Entity {
         if (map.getTile(x, y).getType() == TileType.RUBBLE) {
             map.getTile(x, y).setType(TileType.FLOOR);
             game.drawMapChange(x, y, new Color(153, 153, 153));
+            inventory.add(new Item("Gold lump","Lumps of gold mined by the company.",1));
         }
     }
 }

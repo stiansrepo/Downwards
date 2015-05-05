@@ -19,7 +19,7 @@ public class Entity {
     public int height;
     public Color color;
     public EntityType e;
-    public List<Item> inventory;
+    public List inventory;
     public Weapon weapon;
     public String name;
     public boolean alive = true;

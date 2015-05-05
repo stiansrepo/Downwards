@@ -138,10 +138,9 @@ public class InfoPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (inventory.getSelectedIndex() != -1) {
-                    Weapon w = (Weapon)frame.getGame().player.inventory.get(inventory.getSelectedIndex());
+                    Item w = (Item) frame.getGame().player.inventory.get(inventory.getSelectedIndex());
                     String desc = w.getDescription();
-                    String dmg = w.getDice();
-                    String total = desc + "\n" + dmg + " damage.";
+                    String total = desc + "\n";
                     JOptionPane.showMessageDialog(null, total);
                 }
             }
@@ -150,8 +149,10 @@ public class InfoPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (inventory.getSelectedIndex() != -1) {
-                    frame.getGame().player.equipWeapon((Weapon) frame.getGame().player.inventory.get(inventory.getSelectedIndex()));
-
+                    Object o = frame.getGame().player.inventory.get(inventory.getSelectedIndex());
+                    if(o instanceof Weapon) {
+                     frame.getGame().player.equipWeapon((Weapon)(frame.getGame().player.inventory.get(inventory.getSelectedIndex())));
+                    }
                 }
             }
         });
