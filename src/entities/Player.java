@@ -107,6 +107,7 @@ public class Player extends Entity {
                         this.inventory.addAll(chest.getItems());
                         game.updateInventory();
                         game.drawMapChange(x+k, y+l, new Color(190, 190, 0));
+                        return;
                     }
                 }
             }

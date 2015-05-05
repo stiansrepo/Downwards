@@ -136,7 +136,7 @@ public class Game {
 
     private void setPlayerStart() {
         boolean found = false;
-        Stats stats = new Stats(1, 0, 40, 8, 10, 10, 8, 10);
+        Stats stats = new Stats(1, 0, 14, 8, 10, 10, 8, 10);
         EntityMover em = new EntityMover(EntityType.PLAYER);
         while (!found) {
             int x = 1 + rnd.nextInt(map.getWidth() - 1);

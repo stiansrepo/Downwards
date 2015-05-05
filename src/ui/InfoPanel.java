@@ -11,6 +11,8 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,6 +23,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -62,7 +65,7 @@ public class InfoPanel extends JPanel {
         inspect.setFocusable(false);
         equip.setFocusable(false);
 
-        combat = new JTextArea("");
+        combat = new JTextArea();
         invListModel = new DefaultListModel();
         inventory = new JList(invListModel);
         inventory.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -89,16 +92,16 @@ public class InfoPanel extends JPanel {
 
     }
 
-    public void initStatPanel() {
+    private void initStatPanel() {
         statPanel = new JPanel();
-        statPanel.setLayout(new GridLayout(1,1,15,0));
+        statPanel.setLayout(new GridLayout(1, 1, 15, 0));
         firstStatArea = new JTextArea();
         secondStatArea = new JTextArea();
-        
-        firstStatArea.setPreferredSize(new Dimension(120,100));
-        
-        secondStatArea.setPreferredSize(new Dimension(120,100));
-        
+
+        firstStatArea.setPreferredSize(new Dimension(120, 100));
+
+        secondStatArea.setPreferredSize(new Dimension(120, 100));
+
         Font font = new Font("Verdana", Font.BOLD, 12);
         firstStatArea.setFont(font);
         secondStatArea.setFont(font);
@@ -135,7 +138,7 @@ public class InfoPanel extends JPanel {
         statPanel.add(secondStatArea);
     }
 
-    public void setConstraints() {
+    private void setConstraints() {
         statPanelC.gridheight = 4;
         statPanelC.gridwidth = 2;
         statPanelC.gridx = 0;
@@ -177,7 +180,7 @@ public class InfoPanel extends JPanel {
         inventoryC.anchor = GridBagConstraints.LINE_START;
     }
 
-    public void addButtonStuff() {
+    private void addButtonStuff() {
         inspect.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -195,7 +198,8 @@ public class InfoPanel extends JPanel {
                         desc = w.getDescription() + "\n" + w.getDice() + " damage.";
                         total = desc;
                     }
-                    JOptionPane.showMessageDialog(null, total);
+                    Item w = (Item) frame.getGame().getPlayer().inventory.get(inventory.getSelectedIndex());
+                    JOptionPane.showMessageDialog(null, total, "Inspecting " + w.getName(), JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         }
@@ -228,13 +232,10 @@ public class InfoPanel extends JPanel {
     }
 
     public void updateCombat(String s) {
+        
         combat.append(s);
         combat.setCaretPosition(combat.getDocument().getLength());
-        /*try {
-         combat.getDocument().insertString(0, s, null);
-         } catch (BadLocationException e) {
-         e.printStackTrace();
-         }*/
+
     }
 
     public void updateInventory(List<Item> s) {
