@@ -1,6 +1,9 @@
 package downwards;
 
 // @author laptopng34
+
+import ui.Frame;
+
 public class Downwards {
 
     public static void main(String[] args) throws InterruptedException {
