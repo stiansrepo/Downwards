@@ -11,6 +11,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class Chest extends Thing {
 
     private CopyOnWriteArrayList contents;
+    private boolean empty;
 
     public Chest(int x, int y, ThingType t, boolean in, WorldMap map, Game game) {
         super(x, y, t, in,map,game);
@@ -37,12 +38,13 @@ public class Chest extends Thing {
         if (contents != null) {
             CopyOnWriteArrayList c = new CopyOnWriteArrayList(contents);
             contents.clear();
+            empty=true;
             return c;
         }
         return null;
     }
     
     public boolean isEmpty(){
-        return contents==null;
+        return empty;
     }
 }

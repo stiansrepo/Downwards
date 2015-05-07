@@ -3,25 +3,79 @@ package map;
  // @author laptopng34
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MapGenerator implements MapInterface {
 
     private int width;
     private int height;
     private boolean[][] visited;
-
     private Tile[][] terrain;
     private Random rnd = new Random();
+    private CopyOnWriteArrayList<Tile[][]> rooms;
+
+    int cellAmountX = 10;
+    int cellAmountY = 10;
+    int cellSizeX;
+    int cellSizeY;
 
     public MapGenerator(int x, int y) {
         this.width = x;
         this.height = y;
+        cellSizeX = width / cellAmountX;
+        cellSizeY = height / cellAmountY;
         visited = new boolean[width][height];
         terrain = new Tile[width][height];
         generateMap();
     }
 
     private void generateMap() {
+        generateRooms();
+
+    }
+
+    private void generateRooms() {
+        
+        rooms = new CopyOnWriteArrayList<>();
+        Tile[][] t;
+        int cellX = 0;
+        int cellY = 0;
+
+        while (cellY < cellAmountY) {
+            t = new Tile[cellSizeX][cellSizeY];
+            int roomSizeX = 4+rnd.nextInt(12);
+            int roomSizeY = 4+rnd.nextInt(12);
+            int xMargin = rnd.nextInt(2);
+            int yMargin = rnd.nextInt(2);
+            
+            if (cellX % cellAmountX == 0 && cellX != 0) {
+                cellY++;
+                cellX = 0;
+            }
+            for (int i = 0; i < cellSizeX; i++) {
+                for (int j = 0; j < cellSizeY; j++) {
+                    int coordx = i + cellSizeX * cellX;
+                    int coordy = j + cellSizeY * cellY;
+                    if (coordx == width || coordy == height) {
+                        return;
+                    }
+                    if (i > xMargin && i < roomSizeX && j > yMargin && j < roomSizeY) {
+                        terrain[coordx][coordy] = new Tile(coordx, coordy, TileType.FLOOR);
+                        t[i][j] = new Tile(coordx, coordy, TileType.FLOOR);
+                    } else {
+                        terrain[coordx][coordy] = new Tile(coordx, coordy, TileType.WALL);
+                        t[i][j] = new Tile(coordx, coordy, TileType.WALL);
+                    }
+                }
+            }
+            rooms.add(t);
+            cellX++;
+
+        }
+
+    }
+
+    private void generateCavernsAndLakes() {
         randomFill(49);
         makeCaverns();
 
@@ -30,16 +84,14 @@ public class MapGenerator implements MapInterface {
         makeCaverns();
         makeCaverns();
 
-        
         fillDisjointedRooms();
-        
+
         createWallsAtBorders();
 
         generateLakes(8);
         caveIn();
         makeSilt();
         makeStraySilt(12);
-
     }
 
     private Tile[][] deepCopyTerrain() {
@@ -404,6 +456,10 @@ public class MapGenerator implements MapInterface {
     @Override
     public int getHeight() {
         return height;
+    }
+    
+    public CopyOnWriteArrayList<Tile[][]> getRooms(){
+        return rooms;
     }
 
     @Override

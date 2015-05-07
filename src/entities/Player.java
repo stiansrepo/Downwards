@@ -102,12 +102,14 @@ public class Player extends Entity {
         for (int k = -1; k < 2; k++) {
             for (int l = -1; l < 2; l++) {
                 if (game.getMap().getThing(x + k, y + l) != null) {
-                    if (game.getMap().getThing(x + k, y + l).getType() == ThingType.CHEST) {
+                    if ((game.getMap().getThing(x + k, y + l).getType() == ThingType.CHEST)) {
                         Chest chest = (Chest) game.getMap().getThing(x + k, y + l);
-                        this.inventory.addAll(chest.getItems());
-                        game.updateInventory();
-                        game.drawMapChange(x+k, y+l, new Color(190, 190, 0));
-                        return;
+                        if (!chest.isEmpty()) {
+                            this.inventory.addAll(chest.getItems());
+                            game.updateInventory();
+                            game.drawMapChange(x + k, y + l, new Color(190, 190, 0));
+                            return;
+                        }
                     }
                 }
             }

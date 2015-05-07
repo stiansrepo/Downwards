@@ -5,22 +5,30 @@ package map;
 import entities.Entity;
 import entities.EntityMover;
 import entities.EntityType;
+import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import things.Thing;
 import things.ThingType;
 
 
 public class WorldMap implements MapInterface {
 
-    public final int WIDTH = 100;
-    public final int HEIGHT = 100;
+    public final int WIDTH = 200;
+    public final int HEIGHT = 200;
     private Thing[][] things = new Thing[WIDTH][HEIGHT];
     private Tile[][] terrain = new Tile[WIDTH][HEIGHT];
     private Entity[][] entities = new Entity[WIDTH][HEIGHT];
     private boolean[][] visited = new boolean[WIDTH][HEIGHT];
+    private CopyOnWriteArrayList<Tile[][]> rooms;
 
     public WorldMap() {
         MapGenerator mg = new MapGenerator(WIDTH, HEIGHT);
         terrain = mg.getTerrain();
+        rooms = mg.getRooms();
+    }
+    
+    public CopyOnWriteArrayList<Tile[][]> getRooms(){
+        return rooms;
     }
 
     @Override
@@ -47,8 +55,8 @@ public class WorldMap implements MapInterface {
     }
 
     public boolean blockedThing(ThingType t, int xt, int yt) {
-        for (int i = -2; i < 3; i++) {
-            for (int j = -2; j < 3; j++) {
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
                 if (getThing(xt+i, yt+j) != null) {
                     return true;
                 }

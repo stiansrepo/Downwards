@@ -186,7 +186,7 @@ public class InfoPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 if (inventory.getSelectedIndex() != -1) {
                     String total = "";
-                    String desc = "";
+                    String desc;
                     Object o = (Object) frame.getGame().player.inventory.get(inventory.getSelectedIndex());
                     if (o instanceof Item) {
                         Item i = (Item) o;

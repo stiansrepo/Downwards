@@ -19,9 +19,13 @@ import map.WorldMap;
 import map.Node;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
+import map.Tile;
 
 public class Game {
 
@@ -42,7 +46,7 @@ public class Game {
     private Map<Node, Color> changeMap;
 
     public Game(Frame frame) {
-        this.frame=frame;
+        this.frame = frame;
         changeMap = new HashMap();
         itemGenerator = new ItemGenerator();
         monsterGenerator = new MonsterGenerator();
@@ -51,21 +55,21 @@ public class Game {
         rnd = new Random();
         map = new WorldMap();
         setPlayerStart();
-        placeChests(20);
-        setMonsterStart(25);
-        
+        placeChests(100);
+        setMonsterStart(50);
+
     }
-    
-    public void initPanels(){
+
+    public void initPanels() {
         this.infoPanel = frame.getInfoPanel();
         this.mapPanel = frame.getMapPanel();
     }
-    
-    public Chest[] getChests(){
+
+    public Chest[] getChests() {
         return chests;
     }
-    
-    public Player getPlayer(){
+
+    public Player getPlayer() {
         return player;
     }
 
@@ -100,7 +104,7 @@ public class Game {
             int y = 1 + rnd.nextInt(map.getHeight() - 1);
             if (!map.blocked(em, x, y)) {
                 Weapon wp = itemGenerator.generateWeapon();
-                monsters[found] = new Monster(x, y, 1, 1, this.map, this,monsterGenerator.generateMonster());
+                monsters[found] = new Monster(x, y, 1, 1, this.map, this, monsterGenerator.generateMonster());
                 found++;
             }
         }
@@ -109,18 +113,44 @@ public class Game {
     private void placeChests(int amt) {
         chests = new Chest[amt];
         int found = 0;
+        /*while (found < amt) {
+         int x = 4 + rnd.nextInt(map.getWidth() - 8);
+         int y = 4 + rnd.nextInt(map.getHeight() - 8);
+         if (!map.blockedThing(ThingType.CHEST, x, y)) {
+         Weapon wp = itemGenerator.generateWeapon();
+         Chest chest = new Chest(x,y,ThingType.CHEST,true,map,this);
+         chest.addContents(wp);
+         chests[found] = chest;
+         found++;
+         }
+         }*/
         while (found < amt) {
-            int x = 4 + rnd.nextInt(map.getWidth() - 8);
-            int y = 4 + rnd.nextInt(map.getHeight() - 8);
-            if (!map.blockedThing(ThingType.CHEST, x, y)) {
-                Weapon wp = itemGenerator.generateWeapon();
-                Chest chest = new Chest(x,y,ThingType.CHEST,true,map,this);
-                chest.addContents(wp);
-                chests[found] = chest;
-                found++;
+            CopyOnWriteArrayList<Tile[][]> rooms = map.getRooms();
+            int cnt = 0;
+
+            while (cnt < rooms.size()) {
+                int x = 1 + rnd.nextInt(18);
+                int y = 1 + rnd.nextInt(18);
+                if (!map.blockedThing(ThingType.CHEST, rooms.get(cnt)[x][y].getX(), rooms.get(cnt)[x][y].getY())) {
+                    Weapon wp = itemGenerator.generateWeapon();
+                    Chest chest = new Chest(rooms.get(cnt)[x][y].getX(), rooms.get(cnt)[x][y].getY(), ThingType.CHEST, true, map, this);
+                    chest.addContents(wp);
+                    chests[found] = chest;
+                    found++;
+                    if (found > amt - 1) {
+                        return;
+                    }
+                    cnt++;
+
+                }
+                if (found > amt - 1) {
+                    return;
+                }
+
             }
         }
     }
+
     public void updateInventory() {
 
         infoPanel.updateInventory(player.inventory);
@@ -161,15 +191,15 @@ public class Game {
                 m.interactWithTile();
             }
         }
-        if(player.getStats().getXp()>player.getStats().getLevel()*player.getStats().getLevel()*500){
+        if (player.getStats().getXp() > player.getStats().getLevel() * player.getStats().getLevel() * 500) {
             levelUp();
         }
         endTurn();
     }
-    
-    private void levelUp(){
+
+    private void levelUp() {
         player.getStats().levelUp();
-        setCombatInfo(player.name + " has reached level " + player.getStats().getLevel()+"!");
+        setCombatInfo(player.name + " has reached level " + player.getStats().getLevel() + "!");
     }
 
     public int getTurn() {

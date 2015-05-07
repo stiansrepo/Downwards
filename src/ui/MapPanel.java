@@ -12,6 +12,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -27,6 +29,10 @@ import javax.swing.JPanel;
 
 public class MapPanel extends JPanel implements ComponentListener {
 
+    private GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+    private double width = gd.getDisplayMode().getWidth();
+    private double height = gd.getDisplayMode().getHeight();
+    private int sc = (int) Math.round(width/height*25);
     private Frame frame;
     private BufferedImage drawnMap;
     private int offsetMaxX;
@@ -37,17 +43,17 @@ public class MapPanel extends JPanel implements ComponentListener {
     private int camY;
     private WorldMap map;
     private Game game;
-    private final int scale = 23;
+    private final int scale = sc;
     private Player player;
     private Monster[] monsters;
 
     public MapPanel(Frame frame) {
-        this.frame=frame;
-        this.game=frame.getGame();
+        this.frame = frame;
+        this.game = frame.getGame();
         addListeners();
         this.addComponentListener(this);
         setFocusable(true);
-        
+
         player = game.getPlayer();
         map = game.getMap();
         player = game.getPlayer();
@@ -56,8 +62,8 @@ public class MapPanel extends JPanel implements ComponentListener {
         offsetMaxY = map.getHeight() - getHeight();
         drawMap();
     }
-    
-    private void init(){
+
+    private void init() {
         this.game = frame.getGame();
     }
 
@@ -155,7 +161,7 @@ public class MapPanel extends JPanel implements ComponentListener {
                             g2d.setColor(new Color(109, 185, 66));
                             break;
                         case GRIT:
-                            g2d.setColor(new Color(138,114,87));
+                            g2d.setColor(new Color(138, 114, 87));
                             break;
                         case WALL:
                             g2d.setColor(Color.BLACK);
@@ -171,11 +177,10 @@ public class MapPanel extends JPanel implements ComponentListener {
                     ThingType t = map.getThing(i, j).getType();
                     switch (t) {
                         case CHEST:
-                            Chest c = (Chest)map.getThing(i, j);
-                            if(c.isEmpty()){
+                            Chest c = (Chest) map.getThing(i, j);
+                            if (c.isEmpty()) {
                                 g2d.setColor(new Color(190, 190, 0));
-                            }
-                            else{
+                            } else {
                                 g2d.setColor(new Color(240, 240, 0));
                             }
                             break;
