@@ -7,15 +7,15 @@ import map.WorldMap;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
+import map.MapGenerator;
 
 public class Chest extends Thing {
 
     private CopyOnWriteArrayList contents;
     private boolean empty;
 
-    public Chest(int x, int y, ThingType t, boolean in, WorldMap map, Game game) {
-        super(x, y, t, in,map,game);
-        map.setThing(this, x, y);
+    public Chest(int x, int y, ThingType t, boolean in, Game game) {
+        super(x, y, t, in, game);
     }
     
     public void addContents(Item i) {
@@ -43,6 +43,7 @@ public class Chest extends Thing {
         }
         return null;
     }
+    
     
     public boolean isEmpty(){
         return empty;

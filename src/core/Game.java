@@ -9,14 +9,14 @@ import items.ItemGenerator;
 import items.Weapon;
 import stats.Stats;
 import entities.Monster;
-import entities.EntityMover;
+import pathfinding.EntityMover;
 import entities.EntityType;
 import entities.MonsterGenerator;
 import entities.Player;
 import things.ThingType;
 import things.Chest;
 import map.WorldMap;
-import map.Node;
+import pathfinding.Node;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import map.Tile;
+import map.TileType;
 
 public class Game {
 
@@ -33,7 +34,6 @@ public class Game {
     public WorldMap map;
     public Player player;
     public Monster[] monsters;
-    public Chest[] chests;
     public Random rnd;
     public int turn;
     private InfoPanel infoPanel;
@@ -53,20 +53,15 @@ public class Game {
         combatparser = new CombatParser(this);
         infostring = new String[3];
         rnd = new Random();
-        map = new WorldMap();
+        map = new WorldMap(this);
         setPlayerStart();
-        placeChests(100);
-        setMonsterStart(50);
+        setMonsterStart(25);
 
     }
 
     public void initPanels() {
         this.infoPanel = frame.getInfoPanel();
         this.mapPanel = frame.getMapPanel();
-    }
-
-    public Chest[] getChests() {
-        return chests;
     }
 
     public Player getPlayer() {
@@ -102,7 +97,7 @@ public class Game {
         while (found < amt) {
             int x = 1 + rnd.nextInt(map.getWidth() - 1);
             int y = 1 + rnd.nextInt(map.getHeight() - 1);
-            if (!map.blocked(em, x, y)) {
+            if (map.getTerrain()[x][y].getType()==TileType.FLOOR) {
                 Weapon wp = itemGenerator.generateWeapon();
                 monsters[found] = new Monster(x, y, 1, 1, this.map, this, monsterGenerator.generateMonster());
                 found++;
@@ -110,47 +105,7 @@ public class Game {
         }
     }
 
-    private void placeChests(int amt) {
-        chests = new Chest[amt];
-        int found = 0;
-        /*while (found < amt) {
-         int x = 4 + rnd.nextInt(map.getWidth() - 8);
-         int y = 4 + rnd.nextInt(map.getHeight() - 8);
-         if (!map.blockedThing(ThingType.CHEST, x, y)) {
-         Weapon wp = itemGenerator.generateWeapon();
-         Chest chest = new Chest(x,y,ThingType.CHEST,true,map,this);
-         chest.addContents(wp);
-         chests[found] = chest;
-         found++;
-         }
-         }*/
-        while (found < amt) {
-            CopyOnWriteArrayList<Tile[][]> rooms = map.getRooms();
-            int cnt = 0;
-
-            while (cnt < rooms.size()) {
-                int x = 1 + rnd.nextInt(18);
-                int y = 1 + rnd.nextInt(18);
-                if (!map.blockedThing(ThingType.CHEST, rooms.get(cnt)[x][y].getX(), rooms.get(cnt)[x][y].getY())) {
-                    Weapon wp = itemGenerator.generateWeapon();
-                    Chest chest = new Chest(rooms.get(cnt)[x][y].getX(), rooms.get(cnt)[x][y].getY(), ThingType.CHEST, true, map, this);
-                    chest.addContents(wp);
-                    chests[found] = chest;
-                    found++;
-                    if (found > amt - 1) {
-                        return;
-                    }
-                    cnt++;
-
-                }
-                if (found > amt - 1) {
-                    return;
-                }
-
-            }
-        }
-    }
-
+   
     public void updateInventory() {
 
         infoPanel.updateInventory(player.inventory);
@@ -168,14 +123,15 @@ public class Game {
         boolean found = false;
         Stats stats = new Stats(1, 0, 14, 8, 10, 10, 8, 10);
         EntityMover em = new EntityMover(EntityType.PLAYER);
-        while (!found) {
-            int x = 1 + rnd.nextInt(map.getWidth() - 1);
-            int y = 1 + rnd.nextInt(map.getHeight() - 1);
-            if (!map.blocked(em, x, y)) {
-                player = new Player(x, y, 1, 1, Color.BLUE, this.map, this, EntityType.PLAYER, "Player", stats);
-                found = true;
-            }
-        }
+         while (!found) {
+         int x = 1 + rnd.nextInt(map.getWidth() - 1);
+         int y = 1 + rnd.nextInt(map.getHeight() - 1);
+         if (map.getTerrain()[x][y].getType()==TileType.FLOOR) {
+         player = new Player(x, y, 1, 1, Color.BLUE, this.map, this, EntityType.PLAYER, "Player", stats);
+         found = true;
+         }
+         }
+        //player = new Player(5, 5, 1, 1, Color.BLUE, this.map, this, EntityType.PLAYER, "Player", stats);
     }
 
     public WorldMap getMap() {

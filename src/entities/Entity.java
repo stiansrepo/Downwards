@@ -1,6 +1,7 @@
 package entities;
 
  // @author laptopng34
+import pathfinding.EntityMover;
 import core.Game;
 import stats.Stats;
 import items.Weapon;

@@ -11,6 +11,7 @@ import map.WorldMap;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.Iterator;
+import things.Door;
 
 public class Player extends Entity {
 
@@ -74,6 +75,7 @@ public class Player extends Entity {
                 break;
             case KeyEvent.VK_O:
                 lootChest();
+                openDoor();
                 break;
         }
     }
@@ -109,6 +111,29 @@ public class Player extends Entity {
                             game.updateInventory();
                             game.drawMapChange(x + k, y + l, new Color(190, 190, 0));
                             return;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void openDoor() {
+        for (int k = -1; k < 2; k++) {
+            for (int l = -1; l < 2; l++) {
+                if (game.getMap().getThing(x + k, y + l) != null) {
+                    if ((game.getMap().getThing(x + k, y + l).getType() == ThingType.DOOR)) {
+                        Door door = (Door) game.getMap().getThing(x + k, y + l);
+                        if (!door.getOpen()) {
+                            door.open();
+                            game.drawMapChange(x + k, y + l, new Color(190, 20, 70));
+                            return;
+                        }
+                        if (door.getOpen()) {
+                            door.close();
+                            game.drawMapChange(x + k, y + l, new Color(240, 40, 100));
+                            return;
+
                         }
                     }
                 }

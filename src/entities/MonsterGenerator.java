@@ -57,7 +57,7 @@ public class MonsterGenerator {
     }
 
     private void addStats() {
-        stats.add(new Stats(1, 1, 10, 3, 5, 8, 2, 1));
+        stats.add(new Stats(1, 1, 12, 5, 5, 8, 2, 1));
     }
 
     private void addWeapons() {

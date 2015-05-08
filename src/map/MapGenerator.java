@@ -1,32 +1,183 @@
 package map;
 
  // @author laptopng34
+import core.Game;
+import items.ItemGenerator;
+import items.Weapon;
+import pathfinding.Mover;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import pathfinding.Pathfinder;
+import things.Chest;
+import things.Door;
+import things.Thing;
+import things.ThingType;
 
 public class MapGenerator implements MapInterface {
 
+    private Chest[] chests;
+    private Door[] doors;
     private int width;
     private int height;
     private boolean[][] visited;
     private Tile[][] terrain;
     private Random rnd = new Random();
     private CopyOnWriteArrayList<Tile[][]> rooms;
-
-    int cellAmountX = 10;
-    int cellAmountY = 10;
+    private ItemGenerator itemGenerator;
+    private Thing[][] things;
+    private Game game;
+    int cellAmountX = 5;
+    int cellAmountY = 5;
     int cellSizeX;
     int cellSizeY;
 
-    public MapGenerator(int x, int y) {
+    public MapGenerator(int x, int y, Game game) {
         this.width = x;
         this.height = y;
+        this.game = game;
+        itemGenerator = new ItemGenerator();
+        things = new Thing[width][height];
         cellSizeX = width / cellAmountX;
         cellSizeY = height / cellAmountY;
         visited = new boolean[width][height];
         terrain = new Tile[width][height];
+
+        makeRoomNetwork();
+        placeDoors(15);
+    }
+
+    public void makeRoomNetwork() {
         generateMap();
+
+        Pathfinder p = new Pathfinder(this);
+
+        makeCaverns();
+        makeCaverns();
+        makeCaverns();
+
+        caveIn();
+
+        p.pathfind();
+        placeChests(25);
+
+        generateLakes(25);
+        makeSilt();
+
+        caveIn();
+        createWallsAtBorders();
+    }
+
+    public Thing[][] getThings() {
+        return things;
+    }
+
+    public Thing getThing(int x, int y) {
+        return things[x][y];
+    }
+
+    @Override
+    public boolean blockedThing(ThingType t, int xt, int yt) {
+
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                if (getThing(xt + i, yt + j) != null) {
+                    return true;
+                }
+            }
+        }
+
+        if (t == ThingType.CHEST) {
+
+            if (findNeighbouringTiles(xt, yt, 1, 1, TileType.WALL) <= 2) {
+                return true;
+            }
+            if (findNeighbouringTiles(xt, yt, 1, 1, TileType.WALL) >= 4) {
+                return true;
+            }
+            if (findNeighbouringTiles(xt, yt, 1, 1, TileType.WALL) == 6) {
+                return true;
+            }
+
+            return (terrain[xt][yt].getType() != TileType.FLOOR
+                    && terrain[xt][yt].getType() != TileType.GRASS
+                    && terrain[xt][yt].getType() != TileType.RUBBLE
+                    && terrain[xt][yt].getType() != TileType.SILT
+                    && terrain[xt][yt].getType() != TileType.GRIT);
+        }
+
+        if (t == ThingType.DOOR) {
+            if (findNeighbouringTiles(xt, yt, 1, 1, TileType.WALL) == 6) {
+
+                return (terrain[xt][yt].getType() != TileType.FLOOR
+                        && terrain[xt][yt].getType() != TileType.GRASS
+                        && terrain[xt][yt].getType() != TileType.RUBBLE
+                        && terrain[xt][yt].getType() != TileType.SILT
+                        && terrain[xt][yt].getType() != TileType.GRIT);
+            }
+        }
+        return true;
+    }
+
+    private void placeChests(int amt) {
+        chests = new Chest[amt];
+        int found = 0;
+
+        while (found < amt) {
+
+            int cnt = 0;
+
+            while (cnt < rooms.size()) {
+                int x = 1 + rnd.nextInt(18);
+                int y = 1 + rnd.nextInt(18);
+                if (!blockedThing(ThingType.CHEST, rooms.get(cnt)[x][y].getX(), rooms.get(cnt)[x][y].getY())) {
+                    Weapon wp = itemGenerator.generateWeapon();
+                    Chest chest = new Chest(rooms.get(cnt)[x][y].getX(), rooms.get(cnt)[x][y].getY(), ThingType.CHEST, true, game);
+
+                    chest.addContents(wp);
+                    chests[found] = chest;
+                    things[rooms.get(cnt)[x][y].getX()][rooms.get(cnt)[x][y].getY()] = chest;
+                    found++;
+                    if (found > amt - 1) {
+                        return;
+                    }
+                    cnt++;
+
+                }
+                if (found > amt - 1) {
+                    return;
+                }
+
+            }
+        }
+    }
+
+    private void placeDoors(int amt) {
+        doors = new Door[amt];
+        int found = 0;
+
+        while (found < amt) {
+            
+            int cnt = 0;
+
+            while (cnt < rooms.size()) {
+                int x = 2 + rnd.nextInt(width-4);
+                int y = 2 + rnd.nextInt(width-4);
+                if (!blockedThing(ThingType.DOOR, x,y)) {
+                    Door door = new Door(x,y,ThingType.DOOR,true,game);
+                    doors[found] = door;
+                    things[x][y] = door;
+                    found++;
+                    if (found > amt - 1) {
+                        return;
+                    }
+                    cnt++;
+                }
+                if (found > amt - 1) {
+                    return;
+                }
+            }
+        }
     }
 
     private void generateMap() {
@@ -34,8 +185,24 @@ public class MapGenerator implements MapInterface {
 
     }
 
+    public int getCellAmountX() {
+        return cellAmountX;
+    }
+
+    public int getCellAmountY() {
+        return cellAmountY;
+    }
+
+    public int getCellSizeX() {
+        return cellSizeX;
+    }
+
+    public int getCellSizeY() {
+        return cellSizeY;
+    }
+
     private void generateRooms() {
-        
+
         rooms = new CopyOnWriteArrayList<>();
         Tile[][] t;
         int cellX = 0;
@@ -43,11 +210,11 @@ public class MapGenerator implements MapInterface {
 
         while (cellY < cellAmountY) {
             t = new Tile[cellSizeX][cellSizeY];
-            int roomSizeX = 4+rnd.nextInt(12);
-            int roomSizeY = 4+rnd.nextInt(12);
+            int roomSizeX = 6 + rnd.nextInt(13);
+            int roomSizeY = 6 + rnd.nextInt(13);
             int xMargin = rnd.nextInt(2);
             int yMargin = rnd.nextInt(2);
-            
+
             if (cellX % cellAmountX == 0 && cellX != 0) {
                 cellY++;
                 cellX = 0;
@@ -70,9 +237,7 @@ public class MapGenerator implements MapInterface {
             }
             rooms.add(t);
             cellX++;
-
         }
-
     }
 
     private void generateCavernsAndLakes() {
@@ -186,6 +351,28 @@ public class MapGenerator implements MapInterface {
                             if (terrain[i + k][j + l].getType() == TileType.FLOOR) {
                                 terrain[i + k][j + l].setType(TileType.RUBBLE);
                             }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void caveOut() {
+        Random random = new Random();
+        int count = 0;
+        while (count < 1000) {
+            int rx = 4 + random.nextInt(width - 6);
+            int ry = 4 + random.nextInt(height - 6);
+            if (terrain[rx][ry].getType() == TileType.FLOOR) {
+                for (int k = -1; k < 2; k++) {
+                    for (int l = -1; l < 2; l++) {
+                        if (terrain[rx + k][ry + l].getType() == TileType.WALL) {
+                            if (rnd.nextInt(100) > 50) {
+                                terrain[rx + k][ry + l].setType(TileType.FLOOR);
+
+                            }
+                            count++;
                         }
                     }
                 }
@@ -436,14 +623,6 @@ public class MapGenerator implements MapInterface {
         return new Tile(x, y, TileType.FLOOR);
     }
 
-    private void fillArea(int x, int y, int areaWidth, int areaHeight, TileType type) {
-        for (int xp = x; xp < x + areaWidth; xp++) {
-            for (int yp = y; yp < y + areaHeight; yp++) {
-                terrain[xp][yp] = new Tile(xp, yp, type);
-            }
-        }
-    }
-
     public Tile[][] getTerrain() {
         return terrain;
     }
@@ -457,8 +636,8 @@ public class MapGenerator implements MapInterface {
     public int getHeight() {
         return height;
     }
-    
-    public CopyOnWriteArrayList<Tile[][]> getRooms(){
+
+    public CopyOnWriteArrayList<Tile[][]> getRooms() {
         return rooms;
     }
 

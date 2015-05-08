@@ -26,13 +26,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JPanel;
+import things.Door;
 
 public class MapPanel extends JPanel implements ComponentListener {
 
     private GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     private double width = gd.getDisplayMode().getWidth();
     private double height = gd.getDisplayMode().getHeight();
-    private int sc = (int) Math.round(width/height*25);
+    private int sc = (int) Math.round(width/height*35);
     private Frame frame;
     private BufferedImage drawnMap;
     private int offsetMaxX;
@@ -139,7 +140,7 @@ public class MapPanel extends JPanel implements ComponentListener {
         g2d.fillRect(x, y, 1, 1);
     }
 
-    private void drawMap() {
+    public void drawMap() {
         drawnMap = new BufferedImage(map.getWidth(), map.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = drawnMap.createGraphics();
 
@@ -184,6 +185,13 @@ public class MapPanel extends JPanel implements ComponentListener {
                                 g2d.setColor(new Color(240, 240, 0));
                             }
                             break;
+                        case DOOR:
+                            Door d = (Door) map.getThing(i, j);
+                            if(!d.getOpen()){
+                                g2d.setColor(new Color(240, 40, 100));
+                            }else{
+                                g2d.setColor(new Color(190, 20, 70));
+                            }
                         default:
                             break;
                     }

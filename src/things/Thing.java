@@ -15,13 +15,21 @@ public class Thing {
     private WorldMap map;
     private Game game;
     
-    public Thing (int x, int y, ThingType t,boolean in, WorldMap map, Game game){
+    public Thing (int x, int y, ThingType t,boolean in, Game game){
         this.x=x;
         this.y=y;
         this.t=t;
         this.in=in;
-        this.map=map;
+        this.map=game.getMap();
         this.game=game;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
     
     public int getX(){
