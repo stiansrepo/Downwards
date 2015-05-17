@@ -4,8 +4,6 @@ package things;
 import core.Game;
 import map.WorldMap;
 
-
- 
 public class Thing {
 
     private int x;

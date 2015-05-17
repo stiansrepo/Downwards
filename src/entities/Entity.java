@@ -7,10 +7,21 @@ import stats.Stats;
 import items.Weapon;
 import map.WorldMap;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.RescaleOp;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.imageio.ImageIO;
 
 public class Entity {
 
@@ -33,8 +44,10 @@ public class Entity {
     public Stats stats;
     public int defense;
     public Entity standingOn;
+    private FileInputStream filestream;
 
-    public Entity(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) {
+    public Entity(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) throws FileNotFoundException {
+
         this.x = x;
         this.y = y;
         this.width = width;
@@ -48,7 +61,8 @@ public class Entity {
         inventory = new CopyOnWriteArrayList();
     }
 
-    public Entity(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats, Weapon weapon) {
+    public Entity(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats, Weapon weapon) throws FileNotFoundException {
+
         this.x = x;
         this.y = y;
         this.width = width;
@@ -63,7 +77,7 @@ public class Entity {
         inventory = new CopyOnWriteArrayList();
     }
 
-    public Entity(Color color, EntityType e, String name, Stats stats, Weapon weapon) {
+    public Entity(Color color, EntityType e, String name, Stats stats, Weapon weapon) throws FileNotFoundException {
         this.color = color;
         this.e = e;
         this.name = name;
@@ -72,7 +86,7 @@ public class Entity {
         inventory = new CopyOnWriteArrayList();
     }
 
-    public Entity(int x, int y, int width, int height, WorldMap map, Game game, Monster monster) {
+    public Entity(int x, int y, int width, int height, WorldMap map, Game game, Monster monster) throws FileNotFoundException {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -87,7 +101,7 @@ public class Entity {
         inventory = monster.inventory;
     }
 
-    public Entity(Entity entity) {
+    public Entity(Entity entity) throws FileNotFoundException {
         this.x = entity.x;
         this.y = entity.y;
         this.width = entity.width;
@@ -127,7 +141,7 @@ public class Entity {
         return e;
     }
 
-    public void move() {
+    public void move() throws FileNotFoundException {
 
         EntityMover em = new EntityMover(e);
         if (!game.getGameOver()) {
@@ -177,12 +191,12 @@ public class Entity {
     public Stats getStats() {
         return stats;
     }
-    
-    public int getHealth(){
+
+    public int getHealth() {
         return health;
     }
-    
-    public int getMaxHealth(){
+
+    public int getMaxHealth() {
         return maxhealth;
     }
 
@@ -190,21 +204,26 @@ public class Entity {
         return defense;
     }
 
-    public void levelUp(){
+    public void levelUp() {
         stats.levelUp();
     }
-    
-    public void gainXp(int gained){
-        getStats().setXp(getStats().getXp()+gained);
+
+    public void gainXp(int gained) {
+        getStats().setXp(getStats().getXp() + gained);
     }
-    
-    public void paint(Graphics2D g2d) {
+
+    public void paint(Graphics2D g2d) throws IOException {
+        String path = "";
         if (alive) {
-            g2d.setColor(color);
+            path = getClass().getClassLoader().getResource(e.getFilePath()).getPath();
         } else {
-            g2d.setColor(Color.WHITE);
+            path = getClass().getClassLoader().getResource(e.getFilePathDead()).getPath();
         }
-        g2d.fillRect(x, y, width, height);
+        File file = new File(path);
+        BufferedImage bi = ImageIO.read(file);
+        g2d.drawImage(bi, x * 20, y * 20, null);
+
+        //g2d.fillRect(x, y, width, height);
     }
 
     public int getX() {

@@ -5,6 +5,7 @@ import items.ItemGenerator;
 import stats.Stats;
 import items.Weapon;
 import java.awt.Color;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -26,7 +27,7 @@ public class MonsterGenerator {
         addWeapons();
     }
 
-    public Monster generateMonster() {
+    public Monster generateMonster() throws FileNotFoundException {
         Color c = colors.get(rnd.nextInt(colors.size()));
         EntityType et = entityTypes.get(rnd.nextInt(entityTypes.size()));
         String name = names.get(rnd.nextInt(names.size()));

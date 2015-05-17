@@ -5,6 +5,8 @@ import core.Game;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,11 +18,11 @@ public class Frame extends JFrame {
     public MapPanel mapPanel;
     private InfoPanel infoPanel;
 
-    public Frame() {
+    public Frame() throws FileNotFoundException, IOException {
         initUI();
     }
 
-    private void initUI() {
+    private void initUI() throws FileNotFoundException, IOException {
 
         Font myFont = new Font("Verdana", Font.PLAIN, 12);
 

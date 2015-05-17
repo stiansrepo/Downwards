@@ -10,14 +10,17 @@ import things.Chest;
 import map.WorldMap;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Iterator;
 import things.Door;
+import things.Thing;
 
 public class Player extends Entity {
 
     private Game game;
 
-    public Player(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) {
+    public Player(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) throws FileNotFoundException {
         super(x, y, width, height, color, map, game, e, name, stats);
         maxhealth = 100;
         health = maxhealth;
@@ -51,7 +54,7 @@ public class Player extends Entity {
         }
     }
 
-    public void keyPressed(KeyEvent e) {
+    public void keyPressed(KeyEvent e) throws FileNotFoundException, IOException {
         switch (e.getKeyCode()) {
 
             case KeyEvent.VK_A:
@@ -100,7 +103,7 @@ public class Player extends Entity {
         }
     }
 
-    public void lootChest() {
+    public void lootChest() throws IOException {
         for (int k = -1; k < 2; k++) {
             for (int l = -1; l < 2; l++) {
                 if (game.getMap().getThing(x + k, y + l) != null) {
@@ -109,7 +112,8 @@ public class Player extends Entity {
                         if (!chest.isEmpty()) {
                             this.inventory.addAll(chest.getItems());
                             game.updateInventory();
-                            game.drawMapChange(x + k, y + l, new Color(190, 190, 0));
+                            String ss = getClass().getClassLoader().getResource(chest.getType().getFilePathEmpty()).getPath();
+                            game.drawMapChangeImage(x + k, y + l, ss);
                             return;
                         }
                     }
@@ -118,7 +122,7 @@ public class Player extends Entity {
         }
     }
 
-    public void openDoor() {
+    public void openDoor() throws IOException {
         for (int k = -1; k < 2; k++) {
             for (int l = -1; l < 2; l++) {
                 if (game.getMap().getThing(x + k, y + l) != null) {
@@ -126,12 +130,14 @@ public class Player extends Entity {
                         Door door = (Door) game.getMap().getThing(x + k, y + l);
                         if (!door.getOpen()) {
                             door.open();
-                            game.drawMapChange(x + k, y + l, new Color(190, 20, 70));
+                            String ss = getClass().getClassLoader().getResource(door.getType().getFilePath()).getPath();
+                            game.drawMapChangeImage(x + k, y + l, ss);
                             return;
                         }
                         if (door.getOpen()) {
                             door.close();
-                            game.drawMapChange(x + k, y + l, new Color(240, 40, 100));
+                            String ss = getClass().getClassLoader().getResource(door.getType().getFilePathClosed()).getPath();
+                            game.drawMapChangeImage(x + k, y + l, ss);
                             return;
 
                         }

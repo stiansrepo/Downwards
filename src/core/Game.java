@@ -19,6 +19,8 @@ import map.WorldMap;
 import pathfinding.Node;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,6 +29,7 @@ import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import map.Tile;
 import map.TileType;
+import things.Thing;
 
 public class Game {
 
@@ -45,7 +48,7 @@ public class Game {
     public CombatParser combatparser;
     private Map<Node, Color> changeMap;
 
-    public Game(Frame frame) {
+    public Game(Frame frame) throws FileNotFoundException {
         this.frame = frame;
         changeMap = new HashMap();
         itemGenerator = new ItemGenerator();
@@ -73,6 +76,10 @@ public class Game {
         mapPanel.drawMapChange(x, y, c);
         clearChangeMap();
     }
+    
+    public void drawMapChangeImage(int x, int y, String c) throws IOException{
+        mapPanel.drawMapChangeImage(x, y, c);
+    }
 
     public void clearChangeMap() {
         changeMap.clear();
@@ -82,7 +89,7 @@ public class Game {
         return changeMap;
     }
 
-    public void keyPressed(KeyEvent e) {
+    public void keyPressed(KeyEvent e) throws FileNotFoundException, IOException {
         player.keyPressed(e);
     }
 
@@ -90,7 +97,7 @@ public class Game {
         player.keyReleased(e);
     }
 
-    private void setMonsterStart(int amt) {
+    private void setMonsterStart(int amt) throws FileNotFoundException {
         monsters = new Monster[amt];
         int found = 0;
         EntityMover em = new EntityMover(EntityType.CAVETHING);
@@ -119,7 +126,7 @@ public class Game {
         return gameOver;
     }
 
-    private void setPlayerStart() {
+    private void setPlayerStart() throws FileNotFoundException {
         boolean found = false;
         Stats stats = new Stats(1, 0, 14, 8, 10, 10, 8, 10);
         EntityMover em = new EntityMover(EntityType.PLAYER);
@@ -138,7 +145,7 @@ public class Game {
         return map;
     }
 
-    public void move() {
+    public void move() throws FileNotFoundException {
         player.move();
         for (Monster m : monsters) {
             if (m.isAlive()) {

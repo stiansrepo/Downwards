@@ -7,12 +7,9 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -21,9 +18,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
-import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -35,8 +30,6 @@ public class InfoPanel extends JPanel {
     private JTextArea secondStatArea;
     private Frame frame;
     private String res = "";
-    private JLabel turn;
-    private JLabel health;
     private JList inventory;
     private DefaultListModel invListModel;
     private JTextArea combat;
@@ -232,7 +225,7 @@ public class InfoPanel extends JPanel {
     }
 
     public void updateCombat(String s) {
-        
+
         combat.append(s);
         combat.setCaretPosition(combat.getDocument().getLength());
 

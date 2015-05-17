@@ -6,6 +6,7 @@ import pathfinding.Mover;
 import entities.Entity;
 import pathfinding.EntityMover;
 import entities.EntityType;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.CopyOnWriteArrayList;
 import things.Chest;
@@ -126,7 +127,7 @@ public class WorldMap implements MapInterface {
         return true;
     }
     
-    public void generateMap(){
+    public void generateMap() throws IOException{
         mg = new MapGenerator(WIDTH, WIDTH, game);
         terrain = mg.getTerrain();
         rooms = mg.getRooms();

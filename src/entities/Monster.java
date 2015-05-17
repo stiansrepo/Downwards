@@ -8,6 +8,7 @@ import items.Weapon;
 import map.WorldMap;
 import map.TileType;
 import java.awt.Color;
+import java.io.FileNotFoundException;
 import java.util.Random;
 
 public class Monster extends Entity {
@@ -17,7 +18,7 @@ public class Monster extends Entity {
     private Game game;
     private Random rnd;
 
-    public Monster(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) {
+    public Monster(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats) throws FileNotFoundException {
         super(x, y, width, height, color, map, game, e, name, stats);
         maxhealth = 20;
         health = maxhealth;
@@ -31,7 +32,7 @@ public class Monster extends Entity {
         rnd = new Random();
     }
 
-    public Monster(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats, Weapon weapon) {
+    public Monster(int x, int y, int width, int height, Color color, WorldMap map, Game game, EntityType e, String name, Stats stats, Weapon weapon) throws FileNotFoundException {
         super(x, y, width, height, color, map, game, e, name, stats, weapon);
         maxhealth = 20;
         health = maxhealth;
@@ -45,7 +46,7 @@ public class Monster extends Entity {
         rnd = new Random();
     }
 
-    public Monster(int x, int y, int width, int height, WorldMap map, Game game, Monster monster) {
+    public Monster(int x, int y, int width, int height, WorldMap map, Game game, Monster monster) throws FileNotFoundException {
         super(x, y, width, height, map, game, monster);
         this.x = x;
         this.y = y;
@@ -65,7 +66,7 @@ public class Monster extends Entity {
         rnd = new Random();
     }
 
-    public Monster(Color color, EntityType e, String name, Stats stats, Weapon weapon, int hp) {
+    public Monster(Color color, EntityType e, String name, Stats stats, Weapon weapon, int hp) throws FileNotFoundException {
         super(color, e, name, stats, weapon);
         this.maxhealth = hp;
         this.health = maxhealth;
@@ -125,7 +126,7 @@ public class Monster extends Entity {
     public void interactWithTile() {
         if (map.getTile(x, y).getType() == TileType.RUBBLE) {
             map.getTile(x, y).setType(TileType.FLOOR);
-            game.drawMapChange(x, y, new Color(153, 153, 153));
+            game.drawMapChange(x, y, TileType.FLOOR.getColor());
             inventory.add(new Item("Gold lump","Lumps of gold mined by the company.",1, ItemType.RUBBISH));
         }
     }

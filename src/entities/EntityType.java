@@ -11,7 +11,22 @@ package entities;
  */
 public enum EntityType {
     
-    PLAYER,
-    CAVETHING;
+    PLAYER("player.png"),
+    CAVETHING("cavething.png");
+    
+    private String s;
+    
+    private EntityType(String s){
+        this.s=s;
+    }
+    
+    public String getFilePath(){
+        return s;
+    }
+    
+    public String getFilePathDead(){
+        return "dead"+s;
+    }
+    
     
 }
