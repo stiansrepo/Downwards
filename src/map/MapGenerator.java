@@ -44,10 +44,26 @@ public class MapGenerator implements MapInterface {
         terrain = new Tile[width][height];
 
         makeRoomNetwork();
-        placeDoors(15);
+        //placeDoors(15);
+    }    
+
+    public void setDoor(int tx, int ty) {
+        if (doors == null) {
+            doors = new Door[1];
+        }else{
+            Door[] d = new Door[doors.length+1];
+            int i = 0;
+            for(Door dd : doors){
+                d[i] = doors[i];
+                i++;
+            }
+            doors = d;
+        }
+        doors[doors.length-1] = new Door(tx, ty, ThingType.DOOR, true, game);
+        things[tx][ty] = new Door(tx, ty, ThingType.DOOR, true, game);
     }
 
-    public void makeRoomNetwork() {
+    private void makeRoomNetwork() {
         generateMap();
 
         Pathfinder p = new Pathfinder(this);
@@ -57,14 +73,15 @@ public class MapGenerator implements MapInterface {
         makeCaverns();
 
         caveIn();
-
         p.pathfind();
+
         placeChests(25);
 
         generateLakes(25);
         makeSilt();
 
         caveIn();
+
         createWallsAtBorders();
     }
 
@@ -157,14 +174,14 @@ public class MapGenerator implements MapInterface {
         int found = 0;
 
         while (found < amt) {
-            
+
             int cnt = 0;
 
             while (cnt < rooms.size()) {
-                int x = 2 + rnd.nextInt(width-4);
-                int y = 2 + rnd.nextInt(width-4);
-                if (!blockedThing(ThingType.DOOR, x,y)) {
-                    Door door = new Door(x,y,ThingType.DOOR,true,game);
+                int x = 2 + rnd.nextInt(width - 4);
+                int y = 2 + rnd.nextInt(width - 4);
+                if (!blockedThing(ThingType.DOOR, x, y)) {
+                    Door door = new Door(x, y, ThingType.DOOR, true, game);
                     doors[found] = door;
                     things[x][y] = door;
                     found++;
@@ -219,10 +236,10 @@ public class MapGenerator implements MapInterface {
                 cellY++;
                 cellX = 0;
             }
-            for (int i = 0; i < cellSizeX; i++) {
-                for (int j = 0; j < cellSizeY; j++) {
-                    int coordx = i + cellSizeX * cellX;
-                    int coordy = j + cellSizeY * cellY;
+            for (int j = 0; j < cellSizeX; j++) {
+                for (int i = 0; i < cellSizeY; i++) {
+                    int coordx = j + cellSizeX * cellX;
+                    int coordy = i + cellSizeY * cellY;
                     if (coordx == width || coordy == height) {
                         return;
                     }

@@ -10,6 +10,7 @@ import map.MapInterface;
 import map.Tile;
 import map.TileType;
 import map.WorldMap;
+import things.ThingType;
 
 public class Pathfinder {
 
@@ -17,11 +18,16 @@ public class Pathfinder {
     private ArrayList closed;
     private SortedList open;
     private Node[][] nodes;
+    private int[][] doorLocs;
     private ArrayList<Node> targets;
     private Random random = new Random();
 
     public Pathfinder(MapGenerator mg) {
         this.mg = mg;
+    }
+
+    public int[][] getDoorLocs() {
+        return doorLocs;
     }
 
     public void pathfind() {
@@ -32,6 +38,7 @@ public class Pathfinder {
 
         targets = findTargets();
         nodes = new Node[mg.getWidth()][mg.getHeight()];
+        doorLocs = new int[mg.getWidth()][mg.getHeight()];
         for (int x = 0; x < mg.getWidth(); x++) {
             for (int y = 0; y < mg.getHeight(); y++) {
                 nodes[x][y] = new Node(x, y);
@@ -41,8 +48,8 @@ public class Pathfinder {
         open = new SortedList();
         closed = new ArrayList();
         for (int i = 0; i < targets.size() - 1; i++) {
+            boolean doorfound = false;
             int[][] heuristic = buildHeuristic(targets.get(i + 1).getX(), targets.get(i + 1).getY());
-
             boolean done = false;
             Node from = targets.get(i);
             Node to = targets.get(i + 1);
@@ -85,6 +92,7 @@ public class Pathfinder {
                         if ((x == -1 || x == 1) && (y == 1 || y == -1)) {
                             mcost = 14;
                         }
+
                         if (true) {
                             if ((x != 0) && (y != 0)) {
                                 continue;
@@ -101,6 +109,13 @@ public class Pathfinder {
                     }
                 }
                 mg.getTerrain()[cheapestNode.getX()][cheapestNode.getY()].setType(TileType.FLOOR);
+
+                if (!mg.blockedThing(ThingType.DOOR, cheapestNode.getX(), cheapestNode.getY())) {
+                    if (!doorfound) {
+                        mg.setDoor(cheapestNode.getX(), cheapestNode.getY());
+                        doorfound = true;
+                    }
+                }
                 cheapestNode.setParent(current);
                 current = cheapestNode;
             }
@@ -117,7 +132,7 @@ public class Pathfinder {
         Random rnd = new Random();
         targets = new ArrayList();
         CopyOnWriteArrayList<Tile[][]> roomlist = mg.getRooms();
-        Collections.shuffle(roomlist, new Random());
+        //8Collections.shuffle(roomlist, new Random());
         for (Tile[][] t : roomlist) {
             boolean found = false;
             int x = 2 + rnd.nextInt(mg.getCellSizeX() - 2);
